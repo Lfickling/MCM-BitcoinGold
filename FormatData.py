@@ -33,7 +33,7 @@ y = goldData["Value"] # get y data (relative price)
 
 priceReturns = {}
 for i in range(len(X)):
-    priceReturnToDate = []
+    priceReturnToDate = 0
     currentPrice = y[i]
     for j in range(i):
         priceReturnToDate += log(currentPrice - y[j])
