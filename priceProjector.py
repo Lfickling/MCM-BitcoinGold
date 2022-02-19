@@ -1,3 +1,4 @@
+from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -7,12 +8,22 @@ def trader_main():
 
     #get price, volatility(sigma), and mu()
     comparedReturns = {"date":[],"real":[], "projected":[]}
+    cumVolatility = 0
+    sigmas =  []
 
     bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
 
-    for i in range(5):
+    for i in range(0,15):
         row = bitcoinDF.loc[i].to_list()
-        RowReturner = ProjReturn(row[5], row[8], row[2]) #volatility, cumulative mu, value
+        sigma = row[5]
+        
+        if i >= 2:
+            cumVolatility += (sigma ** 2)
+            sigmas.append(sqrt((1/i) * cumVolatility))
+        else:
+            sigma = 0
+
+        RowReturner = ProjReturn(sigma, row[8], row[2]) #volatility, cumulative mu, value(price)
         projectedReturn = RowReturner.getReturn()
         comparedReturns["date"].append(row[1])
         comparedReturns["real"].append(row[2])
@@ -20,22 +31,17 @@ def trader_main():
     
     comparedReturnsDF = pd.DataFrame(comparedReturns)
 
-    print(comparedReturnsDF.head())
+    print(comparedReturnsDF)
 
     #ax = plt.gca() 
-  
-    
     #comparedReturnsDF.plot(kind = 'line',
             #x = 'date',
             #y = 'real',
             #color = 'green',ax = ax)
-    
-    
     #comparedReturnsDF.plot(kind = 'line',x = 'name',
      #       y = 'projected',
       #      color = 'blue',ax = ax)
-    
-   
+      
     # set the title
     #plt.title('LinePlots')
     
