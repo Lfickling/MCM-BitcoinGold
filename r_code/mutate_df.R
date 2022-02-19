@@ -46,15 +46,39 @@ bitcoin_df <- bitcoin_df %>%
 btc_vol <- calc_vol(bitcoin_df)
 btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
 
-bitcoin_df %>%
+bitcoin_df <- bitcoin_df %>%
     dplyr::mutate(
         volatility = btc_vol,
         log_volatility = btc_log_vol,
         mu = (
             (Value - data.table::shift(Value, n = 1)) / 
                 data.table::shift(Value, n = 1)
-        ),
-        cumulative_mu = mu + data.table::shift(mu, n = 1)
+        )
+    ) 
+
+cumulative_mu <- cumsum(tidyr::replace_na(bitcoin_df$mu, replace = 0))
+
+sum_of_mu_squared_diff <- cumsum(
+    tidyr::replace_na(
+        data = (bitcoin_df$mu - cumulative_mu)^2,
+        replace = 0 )
+    )
+
+calculate_sigma_hat <- function(vec) {
+    ret_vec <- c()
+    
+    for (i in 1:nrow(vec)) {
+        new_value <- c((1 / (i - 1)) * (vec[i]))
+        ret_vec <- c(ret_vec, new_value)
+    }
+    ret_vec
+}
+
+test <- calculate_sigma_hat(sum_of_mu_squared_diff)
+
+bitcoin_df %>%
+    dplyr::mutate(
+        cumulative_mu = cumulative_mu
     ) %>%
     write.csv(file = "bitcoin_df.csv")
     #View()
@@ -88,16 +112,24 @@ gold_df <- gold_df %>%
         mu = (
             (USD..PM. - data.table::shift(USD..PM., n = 1)) / 
                 data.table::shift(USD..PM., n = 1)
-        ),
-        cumulative_mu = mu + data.table::shift(mu, n = 1)
-    ) %>%
-    # Complete adds in NA values for all missing dates.
+        )
+    )
+
+# Complete adds in NA values for all missing dates.
+gold_df <- gold_df %>%
     tidyr::complete(
         Date = seq.Date(
             min(Date), 
             max(Date), 
             by = "day"
-        )
+        ) 
+    )
+    
+cumulative_mu <- cumsum(tidyr::replace_na(gold_df$mu, replace = 0))
+
+gold_df %>%
+    dplyr::mutate(
+        cumulative_mu = cumulative_mu
     ) %>%
     write.csv(file = "gold_df.csv")
 
