@@ -18,11 +18,12 @@ class ProjReturn():
         for i in range(k-1):
             sumReturns += self.getReturnInstance(price)
         self.averageReturn = sumReturns / k
+        #print(self.mu + " " + self.sigma + " " + price + " " + self.averageReturn)
 
 
     def getReturnInstance(self, price):
         norm = np.random.normal(loc = self.mu, scale = self.sigma)
-        returnInstance = price * math.exp(-1 * (self.mu - (0.5 * (self.sigma**2))) * (self.sigma * norm)) 
+        returnInstance = price * math.exp(-1 * (self.mu - (0.5 * (self.sigma**2))) * (self.sigma * norm))  
         return returnInstance
         
     def getReturn(self):

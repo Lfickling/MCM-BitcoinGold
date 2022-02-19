@@ -17,9 +17,11 @@ def trader_main():
         row = bitcoinDF.loc[i].to_list()
         sigma = row[5]
         
-        if i >= 2:
+        if i >= 3:
             cumVolatility += (sigma ** 2)
-            sigmas.append(sqrt((1/i) * cumVolatility))
+            newSigma = (sqrt((1/(i-2)) * cumVolatility))/(i-1)
+            sigmas.append(newSigma)
+            sigma = newSigma
         else:
             sigma = 0
 
