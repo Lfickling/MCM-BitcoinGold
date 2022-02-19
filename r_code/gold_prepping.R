@@ -1,0 +1,66 @@
+# Mutate Gold Data set
+library(dplyr)
+library(data.table)
+library(lubridate)
+
+
+# Load in Gold CSV
+gold_df <- read.csv("LBMA-GOLD.csv") %>%
+    as_tibble()
+
+# Mutate gold df -------------------------------
+gold_df <- gold_df %>%
+    dplyr::filter(!is.na(USD..PM.)) %>%
+    dplyr::mutate(
+        differences = (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100,
+        log_differences = log(USD..PM. / shift(USD..PM., n = 1)),
+        Date = lubridate::mdy(Date)
+    )
+
+# Calculate volatility using difference columns
+gold_vol <- calc_vol(gold_df)
+gold_log_vol <- calc_vol(gold_df, log = TRUE)
+
+gold_df <- gold_df %>%
+    dplyr::mutate(
+        # Adds volatility and log_volatility columns
+        volatility = gold_vol,
+        log_volatility = gold_log_vol,
+        # Adds Mu column
+        mu = (
+            (USD..PM. - data.table::shift(USD..PM., n = 1)) / 
+                data.table::shift(USD..PM., n = 1)
+        )
+    )
+
+# Complete adds in NA values for all missing dates.
+gold_df <- gold_df %>%
+    tidyr::complete(
+        Date = seq.Date(
+            min(Date), 
+            max(Date), 
+            by = "day"
+        ) 
+    )
+
+# Variables -------
+cumulative_mu <- cumsum(tidyr::replace_na(gold_df$mu, replace = 0))
+sum_of_mu_squared_diff <- cumsum(
+    tidyr::replace_na(
+        data = (gold_df$mu - cumulative_mu)^2,
+        replace = 0 )
+)
+gold_sigma_hat <- calculate_sigma_hat(sum_of_mu_squared_diff)
+
+gold_df %>%
+    dplyr::mutate(
+        cumulative_mu = cumulative_mu,
+        sigma_hat = gold_sigma_hat
+    ) %>%
+    write.csv(file = "gold_df.csv")
+
+# Don't re-run -----------------------------------------
+# Remove and isolate NA values in gold dataset
+gold_df %>%
+    dplyr:::filter(is.na(USD..PM.)) %>%
+    write.csv(file = "gold_na_df.csv")
