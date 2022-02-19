@@ -1,12 +1,12 @@
 # load in CSV files
 bitcoin_df <- read.csv("BCHAIN-MKPRU.csv") %>%
     as_tibble()
-gold_df <- read.csv("LBMA-GOLD.csv") %>%
-    as_tibble()
+
 
 library(dplyr)
 library(ggplot2)
 library(data.table)
+library(lubridate)
 
 # Calculate volatility
 calc_vol <- function(df, log = FALSE) {
@@ -54,27 +54,44 @@ bitcoin_df %>%
     write.csv(file = "bitcoin_df")
     #View()
 
+# GOLD MUTATING ----------------------------------
+
+# Load in Gold CSV
+gold_df <- read.csv("LBMA-GOLD.csv") %>%
+    as_tibble()
+
 # Mutate gold df -------------------------------
 gold_df <- gold_df %>%
     dplyr::filter(!is.na(USD..PM.)) %>%
     dplyr::mutate(
         differences = (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100,
         log_differences = log(USD..PM. / shift(USD..PM., n = 1)),
+        Date = lubridate::mdy(Date)
     )
 
 # Calculate volatility using difference columns
 gold_vol <- calc_vol(gold_df)
 gold_log_vol <- calc_vol(gold_df, log = TRUE)
 
-gold_df %>%
+gold_df <- gold_df %>%
     dplyr::mutate(
+        # Adds volatility and log_volatility columns
         volatility = gold_vol,
         log_volatility = gold_log_vol
     ) %>%
+    # Complete adds in NA values for all missing dates.
+    tidyr::complete(
+        Date = seq.Date(
+            min(Date), 
+            max(Date), 
+            by = "day"
+        )
+    ) %>%
     write.csv(file = "gold_df")
-    #View()
 
 # Remove and isolate NA values in gold dataset
 gold_df %>%
     dplyr:::filter(is.na(USD..PM.)) %>%
     write.csv(file = "gold_na_df")
+
+# 
