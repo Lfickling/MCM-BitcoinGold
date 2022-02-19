@@ -6,9 +6,10 @@ def trader_main():
 
     #get price, volatility(sigma), and mu()
 
-    bitcoinDF = pd.read_csv("data_frames/bitcoin_df")
+    bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
 
-    for index,
+    for i in range(1826):
+        
     
     print(bitcoinDF)
 
