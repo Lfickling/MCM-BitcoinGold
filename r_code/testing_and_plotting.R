@@ -1,13 +1,13 @@
-bitcoin_df <- read.csv("Downloads/2022_MCM_ICM_Problems/BCHAIN-MKPRU.csv")
-gold_df <- read.csv("Downloads/2022_MCM_ICM_Problems/LBMA-GOLD.csv")
-
-bitcoin_dt <- as.data.table(bitcoin_df)
+#bitcoin_df <- read.csv("Downloads/2022_MCM_ICM_Problems/BCHAIN-MKPRU.csv")
+#gold_df <- read.csv("Downloads/2022_MCM_ICM_Problems/LBMA-GOLD.csv")
 
 library(dplyr)
 library(ggplot2)
 library(data.table)
 
-# Creates new column with differences
+# -----------[ DATA PREPPING ]------------------
+# Using mutate to add differences and log differences
+# in both the bitcoin and gold data frames
 bitcoin_df %>%
     dplyr::mutate(
         differences = (Value - shift(Value, n = 1)) / Value * 100,
@@ -28,6 +28,7 @@ gold_df %>%
 bitcoin_df <- read.csv("bitcoin_df")
 gold_df <- read.csv("gold_df")
 
+# ------------------[ LINE PLOTS ]----------------------
 
 # -------[ BITCOIN PLOTS ]------------ 
 # bitcoin log difference plot
@@ -40,7 +41,7 @@ ggplot2::ggplot() +
     ylab("Log Return") +
     theme(
         axis.title.x = element_blank()
-    )
+    ) 
 
 # bitcoin true difference plot
 ggplot2::ggplot() +
@@ -79,3 +80,44 @@ ggplot2::ggplot() +
     theme(
         axis.title.x = element_blank(),
     )
+
+# --------------[ HISTOGRAMS ]-----------------------
+# Bitcoin log return histogram
+ggplot2::ggplot(data = bitcoin_df) +
+    geom_histogram(aes(x = log_differences)) +
+    labs(
+        title = "Log Returns of Bitcoin"
+    ) +
+    xlab("Log Return") +
+    ylab("Frequency") +
+    theme_gray()
+
+# Bitcoin true return histogram
+ggplot2::ggplot(data = bitcoin_df) +
+    geom_histogram(aes(x = differences)) +
+    labs(
+        title = "True Returns of Bitcoin"
+    ) +
+    xlab("Return (%)") +
+    ylab("Frequency") +
+    theme_gray()
+
+# Gold log return histogram
+ggplot2::ggplot(data = gold_df) +
+    geom_histogram(aes(x = log_differences)) +
+    labs(
+        title = "Log Returns of Gold"
+    ) +
+    xlab("Log Return") +
+    ylab("Frequency") +
+    theme_gray()
+
+# Gold true return histogram
+ggplot2::ggplot(data = gold_df) +
+    geom_histogram(aes(x = differences)) +
+    labs(
+        title = "True Returns of Bitcoin"
+    ) +
+    xlab("Return (%)") +
+    ylab("Frequency") +
+    theme_gray()
