@@ -2,8 +2,6 @@ library(dplyr)
 library(data.table)
 library(lubridate)
 
-# Helper functions ----------------------------------------------
-# Calculate volatility
 # -----------[ DATA PREPPING ]------------------
 # Using mutate to add differences and log differences
 # in both the bitcoin and gold data frames
