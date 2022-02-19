@@ -1,123 +1,63 @@
-#bitcoin_df <- read.csv("Downloads/2022_MCM_ICM_Problems/BCHAIN-MKPRU.csv")
-#gold_df <- read.csv("Downloads/2022_MCM_ICM_Problems/LBMA-GOLD.csv")
+# load in new updated data frames
+bitcoin_df <- read.csv("data_frames/bitcoin_df")
+gold_df <- read.csv("data_frames/gold_df")
 
 library(dplyr)
 library(ggplot2)
 library(data.table)
 
+# Calculate volatility
+calc_vol <- function(df, log = FALSE) {
+    value_vec <- df$differences
+    ret_val <- c()
+    
+    if (log == FALSE) {
+        value_vec <- df$differences
+        
+        for (i in 1:length(value_vec)) {
+            new_val <- c(sd(c(value_vec[i+1], value_vec[i])))
+            ret_val <- c(ret_val, new_val)
+        }
+    }
+    else {
+        value_vec <- df$log_differences
+        for (i in 1:length(value_vec)) {
+            new_val <- c(sd(c(value_vec[i+1], value_vec[i])))
+            ret_val <- c(ret_val, new_val)
+        }
+    }
+    ret_val
+}
+
 # -----------[ DATA PREPPING ]------------------
 # Using mutate to add differences and log differences
 # in both the bitcoin and gold data frames
+
+# Calculate vol for bitcoin
+btc_vol <- calc_vol(bitcoin_df)
+btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
+
 bitcoin_df %>%
     dplyr::mutate(
         differences = (Value - shift(Value, n = 1)) / Value * 100,
-        log_differences = log(Value / shift(Value, n = 1))
+        log_differences = log(Value / shift(Value, n = 1)),
+        volatility = btc_vol,
+        log_volatility = btc_log_vol
     ) %>%
-    write.csv(file = "bitcoin_df")
-    #View()
+    #write.csv(file = "bitcoin_df")
+    View()
 
+# Calculate vol for gold
+gold_vol <- calc_vol(gold_df)
+gold_log_vol <- calc_vol(gold_df, log = TRUE)
+
+# Modify data frame
 gold_df %>%
     dplyr::mutate(
         differences = (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100,
-        log_differences = log(USD..PM. / shift(USD..PM., n = 1))
+        log_differences = log(USD..PM. / shift(USD..PM., n = 1)),
+        voltaility = gold_vol,
+        log_volatility = gold_log_vol
     ) %>%
-    write.csv(file = "gold_df")
-    #View()
-
-# load in new updated data frames
-bitcoin_df <- read.csv("bitcoin_df")
-gold_df <- read.csv("gold_df")
-
-# ------------------[ LINE PLOTS ]----------------------
-
-# -------[ BITCOIN PLOTS ]------------ 
-# bitcoin log difference plot
-ggplot2::ggplot() +
-    geom_line(data = bitcoin_df, aes(x = as.Date(Date), y = log_differences)) +
-    ylim(c(-0.3,0.2)) +
-    scale_x_date(date_labels = "%d %b %Y") +
-    labs(
-        title = "Log Differences of Bitcoin Data Set Over Time") +
-    ylab("Log Return") +
-    theme(
-        axis.title.x = element_blank()
-    ) 
-
-# bitcoin true difference plot
-ggplot2::ggplot() +
-    geom_line(data = bitcoin_df, aes(x = as.Date(Date), y = differences)) +
-    ylim(c(-25,25)) +
-    scale_x_date(date_labels = "%d %b %Y") +
-    labs(
-        title = "True Differences of Bitcoin Data Set Over Time") +
-    ylab("Return (%)") +
-    theme(
-        axis.title.x = element_blank()
-    )
-
-# -------[GOLD PLOTS]-------
-# gold log difference plot
-ggplot2::ggplot() +
-    geom_line(data = gold_df, aes(x = as.Date(Date), y = log_differences)) +
-    ylim(c(-0.06,0.06)) +
-    scale_x_date(date_labels = "%d %b %Y") +
-    labs(
-        title = "Log Differences of Gold Data Set Over Time") +
-    ylab("Log Return") +
-    theme(
-        axis.title.x = element_blank()
-    )
-
-# gold true difference plot
-ggplot2::ggplot() +
-    geom_line(data = gold_df, aes(x = as.Date(Date), y = differences)) +
-    #ylim(c(-0.06,0.06)) +
-    scale_x_date(date_labels = "%d %b %Y") +
-    labs(
-        title = "True Differences of Gold Value Over Time"
-        ) +
-    ylab("Return (%)") +
-    theme(
-        axis.title.x = element_blank(),
-    )
-
-# --------------[ HISTOGRAMS ]-----------------------
-# Bitcoin log return histogram
-ggplot2::ggplot(data = bitcoin_df) +
-    geom_histogram(aes(x = log_differences)) +
-    labs(
-        title = "Log Returns of Bitcoin"
-    ) +
-    xlab("Log Return") +
-    ylab("Frequency") +
-    theme_gray()
-
-# Bitcoin true return histogram
-ggplot2::ggplot(data = bitcoin_df) +
-    geom_histogram(aes(x = differences)) +
-    labs(
-        title = "True Returns of Bitcoin"
-    ) +
-    xlab("Return (%)") +
-    ylab("Frequency") +
-    theme_gray()
-
-# Gold log return histogram
-ggplot2::ggplot(data = gold_df) +
-    geom_histogram(aes(x = log_differences)) +
-    labs(
-        title = "Log Returns of Gold"
-    ) +
-    xlab("Log Return") +
-    ylab("Frequency") +
-    theme_gray()
-
-# Gold true return histogram
-ggplot2::ggplot(data = gold_df) +
-    geom_histogram(aes(x = differences)) +
-    labs(
-        title = "True Returns of Bitcoin"
-    ) +
-    xlab("Return (%)") +
-    ylab("Frequency") +
-    theme_gray()
+    #write.csv(file = "gold_df")
+    View()
