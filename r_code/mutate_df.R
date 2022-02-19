@@ -53,7 +53,8 @@ bitcoin_df %>%
         mu = (
             (Value - data.table::shift(Value, n = 1)) / 
                 data.table::shift(Value, n = 1)
-        )
+        ),
+        cumulative_mu = mu + data.table::shift(mu, n = 1)
     ) %>%
     write.csv(file = "bitcoin_df.csv")
     #View()
@@ -87,7 +88,8 @@ gold_df <- gold_df %>%
         mu = (
             (USD..PM. - data.table::shift(USD..PM., n = 1)) / 
                 data.table::shift(USD..PM., n = 1)
-        )
+        ),
+        cumulative_mu = mu + data.table::shift(mu, n = 1)
     ) %>%
     # Complete adds in NA values for all missing dates.
     tidyr::complete(
