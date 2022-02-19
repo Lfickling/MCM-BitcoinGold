@@ -12,17 +12,17 @@ calc_vol <- function(df, log = FALSE) {
     ret_val <- c()
     
     if (log == FALSE) {
-        value_vec <- df$differences
+        diff_vec <- df$differences
         
         for (i in 1:length(value_vec)) {
-            new_val <- c(sd(c(value_vec[i+1], value_vec[i])))
+            new_val <- c(sd(c(diff_vec[i+1], diff_vec[i])))
             ret_val <- c(ret_val, new_val)
         }
     }
     else {
-        value_vec <- df$log_differences
-        for (i in 1:length(value_vec)) {
-            new_val <- c(sd(c(value_vec[i+1], value_vec[i])))
+        log_diff_vec <- df$log_differences
+        for (i in 1:length(log_diff_vec)) {
+            new_val <- c(sd(c(log_diff_vec[i+1], log_diff_vec[i])))
             ret_val <- c(ret_val, new_val)
         }
     }
@@ -44,8 +44,8 @@ bitcoin_df %>%
         volatility = btc_vol,
         log_volatility = btc_log_vol
     ) %>%
-    #write.csv(file = "bitcoin_df")
-    View()
+    write.csv(file = "bitcoin_df")
+    #View()
 
 # Calculate vol for gold
 gold_vol <- calc_vol(gold_df)
