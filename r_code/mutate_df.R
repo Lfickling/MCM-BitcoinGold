@@ -1,4 +1,4 @@
-# load in new updated data frames
+# load in CSV files
 bitcoin_df <- read.csv("BCHAIN-MKPRU.csv") %>%
     as_tibble()
 gold_df <- read.csv("LBMA-GOLD.csv") %>%
@@ -41,7 +41,8 @@ bitcoin_df <- bitcoin_df %>%
         differences = (Value - shift(Value, n = 1)) / Value * 100,
         log_differences = log(Value / shift(Value, n = 1)),
     )
-    
+
+# Calculate volatility using difference columns    
 btc_vol <- calc_vol(bitcoin_df)
 btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
 
@@ -55,11 +56,13 @@ bitcoin_df %>%
 
 # Mutate gold df -------------------------------
 gold_df <- gold_df %>%
+    dplyr::filter(!is.na(USD..PM.)) %>%
     dplyr::mutate(
         differences = (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100,
         log_differences = log(USD..PM. / shift(USD..PM., n = 1)),
     )
 
+# Calculate volatility using difference columns
 gold_vol <- calc_vol(gold_df)
 gold_log_vol <- calc_vol(gold_df, log = TRUE)
 
@@ -69,4 +72,9 @@ gold_df %>%
         log_volatility = gold_log_vol
     ) %>%
     write.csv(file = "gold_df")
-#View()
+    #View()
+
+# Remove and isolate NA values in gold dataset
+gold_df %>%
+    dplyr:::filter(is.na(USD..PM.)) %>%
+    write.csv(file = "gold_na_df")
