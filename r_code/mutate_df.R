@@ -51,7 +51,7 @@ bitcoin_df %>%
         volatility = btc_vol,
         log_volatility = btc_log_vol
     ) %>%
-    write.csv(file = "bitcoin_df")
+    write.csv(file = "bitcoin_df.csv")
     #View()
 
 # GOLD MUTATING ----------------------------------
@@ -59,6 +59,11 @@ bitcoin_df %>%
 # Load in Gold CSV
 gold_df <- read.csv("LBMA-GOLD.csv") %>%
     as_tibble()
+
+# Remove and isolate NA values in gold dataset
+gold_df %>%
+    dplyr:::filter(is.na(USD..PM.)) %>%
+    write.csv(file = "gold_na_df.csv")
 
 # Mutate gold df -------------------------------
 gold_df <- gold_df %>%
@@ -87,11 +92,4 @@ gold_df <- gold_df %>%
             by = "day"
         )
     ) %>%
-    write.csv(file = "gold_df")
-
-# Remove and isolate NA values in gold dataset
-gold_df %>%
-    dplyr:::filter(is.na(USD..PM.)) %>%
-    write.csv(file = "gold_na_df")
-
-# 
+    write.csv(file = "gold_df.csv")
