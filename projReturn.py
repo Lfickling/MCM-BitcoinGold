@@ -5,7 +5,7 @@ from math import e
 
 np.random.seed(0)
 
-class Return():
+class ProjReturn():
     
     sigma = 0
     mu = 0
