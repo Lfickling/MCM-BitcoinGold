@@ -15,7 +15,7 @@ goldData = pd.read_csv("./LBMA-GOLD.csv", parse_dates=['Date'], index_col='Date'
 #bitcoinData = pd.read_csv("./BCHAIN-MKPRU.csv", parse_dates=['Date'])
 
 #changes dates to datetime format (rather than strings)
-goldData["datetime"] = fa.stringToDatetime(goldData["Date"].to_list())
+#goldData["datetime"] = fa.stringToDatetime(goldData["Date"].to_list())
 
 
 ## Prepare data
