@@ -1,13 +1,9 @@
-# load in CSV files
-bitcoin_df <- read.csv("BCHAIN-MKPRU.csv") %>%
-    as_tibble()
-
-
 library(dplyr)
 library(ggplot2)
 library(data.table)
 library(lubridate)
 
+# Helper functions ----------------------------------------------
 # Calculate volatility
 calc_vol <- function(df, log = FALSE) {
     value_vec <- df$differences
@@ -35,6 +31,10 @@ calc_vol <- function(df, log = FALSE) {
 # Using mutate to add differences and log differences
 # in both the bitcoin and gold data frames
 
+# load in CSV files
+bitcoin_df <- read.csv("BCHAIN-MKPRU.csv") %>%
+    as_tibble()
+
 # Mutate bitcoin df ----------------------------
 bitcoin_df <- bitcoin_df %>%
     dplyr::mutate(
@@ -49,7 +49,11 @@ btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
 bitcoin_df %>%
     dplyr::mutate(
         volatility = btc_vol,
-        log_volatility = btc_log_vol
+        log_volatility = btc_log_vol,
+        mu = (
+            (Value - data.table::shift(Value, n = 1)) / 
+                data.table::shift(Value, n = 1)
+        )
     ) %>%
     write.csv(file = "bitcoin_df.csv")
     #View()
@@ -60,10 +64,6 @@ bitcoin_df %>%
 gold_df <- read.csv("LBMA-GOLD.csv") %>%
     as_tibble()
 
-# Remove and isolate NA values in gold dataset
-gold_df %>%
-    dplyr:::filter(is.na(USD..PM.)) %>%
-    write.csv(file = "gold_na_df.csv")
 
 # Mutate gold df -------------------------------
 gold_df <- gold_df %>%
@@ -82,7 +82,12 @@ gold_df <- gold_df %>%
     dplyr::mutate(
         # Adds volatility and log_volatility columns
         volatility = gold_vol,
-        log_volatility = gold_log_vol
+        log_volatility = gold_log_vol,
+        # Adds Mu column
+        mu = (
+            (USD..PM. - data.table::shift(USD..PM., n = 1)) / 
+                data.table::shift(USD..PM., n = 1)
+        )
     ) %>%
     # Complete adds in NA values for all missing dates.
     tidyr::complete(
@@ -93,3 +98,9 @@ gold_df <- gold_df %>%
         )
     ) %>%
     write.csv(file = "gold_df.csv")
+
+# Don't re-run -----------------------------------------
+# Remove and isolate NA values in gold dataset
+gold_df %>%
+    dplyr:::filter(is.na(USD..PM.)) %>%
+    write.csv(file = "gold_na_df.csv")
