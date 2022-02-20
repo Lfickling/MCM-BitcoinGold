@@ -12,14 +12,17 @@ def trader_main():
     sigma = 0
     yesterdayMu = 0
     meanSquaredError = 0
-    length = 20
+    sumMu = 0
+
+    length = 60
 
     bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
 
     for i in range(0,length):
         row = bitcoinDF.loc[i].to_list()
-        
-        print("****** ", sigma)
+        if i >= 1:
+            sumMu += row[7]
+        #print("****** ", yesterdayMu)
 
         RowReturner = ProjReturn(sigma, yesterdayMu, yesterdayPrice) #sigma (or sigma hat), mu, value(price)
         projectedReturn = RowReturner.getReturn()
@@ -31,12 +34,13 @@ def trader_main():
         yesterdayPrice = row[2]
         if i >= 2:
             sigma = (row[9])
-            yesterdayMu = (row[8] / i)
+            yesterdayMu = (row[8] / i )
         
         sigmas.append(sigma)     
     
     meanSquaredError = (meanSquaredError / length)
     comparedReturnsDF = pd.DataFrame(comparedReturns)
+
 
     print(comparedReturnsDF)
     print(meanSquaredError)
