@@ -20,6 +20,8 @@ gold_df <- gold_df %>%
 # Calculate volatility using difference columns
 gold_vol <- calc_vol(gold_df)
 gold_log_vol <- calc_vol(gold_df, log = TRUE)
+# Calculate mu and sigma
+gold_mu_sigma_df <- calc_mu_and_sigma(gold_df$USD..PM.)
 
 gold_df <- gold_df %>%
     dplyr::mutate(
@@ -27,11 +29,9 @@ gold_df <- gold_df %>%
         volatility = gold_vol,
         log_volatility = gold_log_vol,
         # Adds Mu column
-        mu = (
-            (USD..PM. - data.table::shift(USD..PM., n = 1)) / 
-                data.table::shift(USD..PM., n = 1)
+        mu = gold_mu_sigma_df$mu_vec,
+        sigma = gold_mu_sigma_df$sigma_vec
         )
-    )
 
 # Complete adds in NA values for all missing dates.
 gold_df <- gold_df %>%

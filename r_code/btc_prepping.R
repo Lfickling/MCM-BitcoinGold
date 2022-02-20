@@ -20,16 +20,15 @@ bitcoin_df <- bitcoin_df %>%
 # Calculate volatility using difference columns    
 btc_vol <- calc_vol(bitcoin_df)
 btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
+mu_sigma_df <- calc_mu_and_sigma(bitcoin_df$Value)
 
 bitcoin_df <- bitcoin_df %>%
     dplyr::mutate(
         volatility = btc_vol,
         log_volatility = btc_log_vol,
-        mu = (
-            (Value - data.table::shift(Value, n = 1)) / 
-                data.table::shift(Value, n = 1)
+        mu = mu_sigma_df$mu_vec,
+        sigma = mu_sigma_df$sigma_vec
         )
-    ) 
 
 cumulative_mu <- cumsum(tidyr::replace_na(bitcoin_df$mu, replace = 0))
 
