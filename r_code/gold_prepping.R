@@ -79,8 +79,11 @@ sync_day <- data.frame(
 gold_data <- rbind(sync_day, gold_df)
 
 gold_data %>% 
-    #write.csv(file = "gold_df.csv")
-    View()
+    dplyr::relocate(
+        weekend, .after = dplyr::last_col()
+    ) %>%
+    #View()
+    write.csv(file = "gold_df.csv")
 
 # Don't re-run -----------------------------------------
 # Remove and isolate NA values in gold dataset
