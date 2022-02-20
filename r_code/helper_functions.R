@@ -21,13 +21,13 @@ calc_vol <- function(df, log = FALSE) {
     ret_val
 }
 
------
+#-----
 
 calculate_sigma_hat <- function(vec) {
     ret_vec <- c()
     
     for (i in 1:length(vec)) {
-        new_value <- c((1 / (i - 1)) * (vec[i]))
+        new_value <- sqrt(c((1 / (i - 1)) * (vec[i])))
         ret_vec <- c(ret_vec, new_value)
     }
     ret_vec
