@@ -6,39 +6,40 @@ from projReturn import ProjReturn
 
 def trader_main():
 
-    #get price, volatility(sigma), and mu()
     comparedReturns = {"date":[],"real":[], "projected":[]}
-    cumVolatility = 0
     sigmas =  []
     yesterdayPrice = 621
+    sigma = 0
+    yesterdayMu = 0
+    meanSquaredError = 0
+    length = 60
 
     bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
 
-    for i in range(0,100):
+    for i in range(0,length):
         row = bitcoinDF.loc[i].to_list()
-        sigma = row[5]
         
-        if i >= 2:
-            cumVolatility += (sigma ** 2)
-            #newSigma = (sqrt((1/(i-2)) * cumVolatility))
-            #sigma = newSigma
-            sigma = row[9]
-        else:
-            sigma = 0
         #print("****** ", i)
 
-        RowReturner = ProjReturn(sigma, row[8], yesterdayPrice) #sigma (or sigma hat), cumulative mu, value(price)
+        RowReturner = ProjReturn(sigma, yesterdayMu, yesterdayPrice) #sigma (or sigma hat), mu, value(price)
         projectedReturn = RowReturner.getReturn()
         comparedReturns["date"].append(row[1])
         comparedReturns["real"].append(row[2])
-        comparedReturns["projected"].append(projectedReturn)  
+        comparedReturns["projected"].append(projectedReturn)
+        meanSquaredError += ((row[2]- projectedReturn) ** 2)
 
         yesterdayPrice = row[2]
+        if i >= 2:
+            sigma = ((row[9] ) * 100 )
+            yesterdayMu = (row[8] / i)
+        
         sigmas.append(sigma)     
     
+    meanSquaredError = (meanSquaredError / length)
     comparedReturnsDF = pd.DataFrame(comparedReturns)
 
-    #print(comparedReturnsDF)
+    print(comparedReturnsDF)
+    print(meanSquaredError)
 
     ax = plt.gca() 
     comparedReturnsDF.plot(kind = 'line',

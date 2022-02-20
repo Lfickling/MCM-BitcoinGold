@@ -21,10 +21,11 @@ class ProjReturn():
         #print("mu is ", self.mu)
         #print("sigma is ", self.sigma)
         #print("price is ", price)
+        #print("projectedPrice is ", self.averageReturn)
 
     def getReturnInstance(self, price):
         norm = np.random.normal(0, 1)
-        returnInstance = price * (e ** (-1 * (self.mu - (0.5 * (self.sigma**2))) + (self.sigma * norm)))  
+        returnInstance = price * (e ** ( (self.mu - (0.5 * (self.sigma**2))) + (self.sigma * norm)))  
         #print("scalar is ", (returnInstance / price))
         #print("exponent is ", (-1 * (self.mu - (0.5 * (self.sigma**2))) * (self.sigma * norm)))
         return returnInstance
