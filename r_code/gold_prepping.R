@@ -57,15 +57,33 @@ sum_of_mu_squared_diff <- cumsum(
 )
 gold_sigma_hat <- calculate_sigma_hat(sum_of_mu_squared_diff)
 
-gold_df %>%
+gold_df <- gold_df %>%
     dplyr::mutate(
         cumulative_mu = cumulative_mu,
         sigma_hat = gold_sigma_hat
-    ) %>%
-    write.csv(file = "gold_df.csv")
+    )
+
+sync_day <- data.frame(
+    Date = lubridate::ymd("2016-09-11"), 
+    USD..PM. = NA, 
+    differences = NA, 
+    log_differences = NA, 
+    volatility = NA, 
+    log_volatility = NA, 
+    mu = NA, 
+    sigma = NA, 
+    weekend = TRUE, 
+    cumulative_mu = NA, 
+    sigma_hat = NA)
+
+gold_data <- rbind(sync_day, gold_df)
+
+gold_data %>% 
+    #write.csv(file = "gold_df.csv")
+    View()
 
 # Don't re-run -----------------------------------------
 # Remove and isolate NA values in gold dataset
-gold_df %>%
-    dplyr:::filter(is.na(USD..PM.)) %>%
-    write.csv(file = "gold_na_df.csv")
+# gold_df %>%
+#     dplyr:::filter(is.na(USD..PM.)) %>%
+#     write.csv(file = "gold_na_df.csv")
