@@ -14,3 +14,14 @@
 
         #compare with net.return(t+1) with risk(t)(n) to choose best path (somehow) Max[exp.return(n) / risk(t)] choose max for [$, B, G]
 
+
+
+class Portfolio():
+
+    portfolio = []
+    
+    def __init__(self, ):
+        self.portfolio = [0]*3
+
+    def getOptimalPortfolio(self):
+        return self.portfolio

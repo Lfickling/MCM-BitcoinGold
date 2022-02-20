@@ -16,14 +16,15 @@ class ProjReturn():
         self.mu = mu
         sumReturns = 0
         for i in range(k):
-            sumReturns += self.getReturnInstance(price)
-        self.averageReturn = sumReturns / k
+            sumReturns += self.getPriceInstance(price)
+        averageTomorrowPrice = sumReturns / k
+        averageReturn = averageTomorrowPrice - price
         #print("mu is ", self.mu)
         #print("sigma is ", self.sigma)
         #print("price is ", price)
         #print("projectedPrice is ", self.averageReturn)
 
-    def getReturnInstance(self, price):
+    def getPriceInstance(self, price):
         norm = np.random.normal(0, 1)
         returnInstance = price * (e ** ( (self.mu - (0.5 * (self.sigma**2))) + (self.sigma * norm)))  
         #print("scalar is ", (returnInstance / price))

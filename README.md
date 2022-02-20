@@ -30,7 +30,7 @@ requisite pieces:
 
         #compare with net.return(t+1) with risk(t)(n) to choose best path (somehow) Max[exp.return(n) / risk(t)] choose max for [$, B, G]
 
-    priceprojector.py:
+    projReturn.py:
 
         takes in current price, sigma hat and new mu  and projects and calculates a projected price
 

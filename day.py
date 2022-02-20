@@ -2,15 +2,20 @@ from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from portfolio import Portfolio
 from projReturn import ProjReturn
 
 def calculateTotalCapital(allocation, prices):
-
-    return
+    capital = 0
+    for i in range(3):
+        capital += prices[i] * allocation[i]
+    return capital
 
 def calculateActualAllocation(ProportionalAllocation, totalCapital, prices):
-
-    return
+    portfolio = [0,0,0]
+    for i in range(3):
+        portfolio[i] = ProportionalAllocation[i] * totalCapital * prices[i]
+    return portfolio
 
 def day_main():
 
@@ -20,8 +25,8 @@ def day_main():
     priceG = 1324.6
     length = 60
 
-    alocations = {1:[0, 1000, 0]}
-    totalCapital = 1000.00
+    alocations = [[0, 1000, 0]]
+    totalCapital = [1000.00]
     comparedReturnsB= {"date":[],"real":[], "projected":[0]}
     comparedReturnsG = {"date":[],"real":[], "projected":[0]}
     
@@ -51,20 +56,25 @@ def day_main():
         projectedReturnG = RowReturnerG.getReturn()
 
         comparedReturnsB["date"].append(date)
-        comparedReturnsB["real"].append(prices[1]])
+        comparedReturnsB["real"].append(prices[1])
         comparedReturnsB["projected"].append(projectedReturnB)
 
         comparedReturnsG["date"].append(date)
-        comparedReturnsG["real"].append(prices[2]])
+        comparedReturnsG["real"].append(prices[2])
         comparedReturnsG["projected"].append(projectedReturnG)
              
+        portfolio = Portfolio()
         #send data to optimalportfolio
+        proportialAlo = portfolio.getOptimalPortfolio()
 
         #change proportional to actual based on capital and price
+        realAlo = calculateActualAllocation(proportialAlo, totalCapital, prices)
 
         #append alocations with new alocations
+        alocations.append(realAlo)
 
         #call calctotalcapital and update
+        totalCapital.append(calculateTotalCapital(realAlo, prices)) 
     
     #comparedReturnsDF = pd.DataFrame(comparedReturns)
 

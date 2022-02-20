@@ -1,3 +1,5 @@
+"""
+
 from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,3 +65,5 @@ def trader_main():
 
 if __name__ == '__main__':
     trader_main()
+
+    """
