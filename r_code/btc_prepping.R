@@ -15,11 +15,15 @@ bitcoin_df <- bitcoin_df %>%
     dplyr::mutate(
         differences = (Value - shift(Value, n = 1)) / Value * 100,
         log_differences = log(Value / shift(Value, n = 1)),
+        Date = lubridate::mdy(Date),
+        weekend = format(Date, "%u") %in% c(6,7)
     )
 
-# Calculate volatility using difference columns    
+# Calculate volatility using difference columns -----   
 btc_vol <- calc_vol(bitcoin_df)
 btc_log_vol <- calc_vol(bitcoin_df, log = TRUE)
+
+# Calculate mu and sigma ----
 mu_sigma_df <- calc_mu_and_sigma(bitcoin_df$Value)
 
 bitcoin_df <- bitcoin_df %>%

@@ -17,6 +17,8 @@ gold_df <- gold_df %>%
         Date = lubridate::mdy(Date)
     )
 
+
+
 # Calculate volatility using difference columns
 gold_vol <- calc_vol(gold_df)
 gold_log_vol <- calc_vol(gold_df, log = TRUE)
@@ -40,7 +42,10 @@ gold_df <- gold_df %>%
             min(Date), 
             max(Date), 
             by = "day"
-        ) 
+        )
+    ) %>%
+    dplyr::mutate(
+        weekend = format(Date, "%u") %in% c(6,7)
     )
 
 # Variables -------
