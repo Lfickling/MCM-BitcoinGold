@@ -49,5 +49,8 @@ bitcoin_df %>%
         cumulative_mu = cumulative_mu,
         sigma_hat = btc_sigma_hat
     ) %>%
+    dplyr::relocate(
+        weekend, .after = dplyr::last_col()
+    ) %>%
     write.csv(file = "bitcoin_df.csv")
     #View()
