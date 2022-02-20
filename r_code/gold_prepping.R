@@ -8,20 +8,40 @@ library(lubridate)
 gold_df <- read.csv("LBMA-GOLD.csv") %>%
     as_tibble()
 
+# Complete adds in NA values for all missing dates.
+gold_df <- gold_df %>%
+    dplyr::mutate(
+        Date = lubridate::mdy(Date)
+    ) %>%
+    tidyr::complete(
+        Date = seq.Date(
+            min(Date), 
+            max(Date), 
+            by = "day"
+        )
+    ) %>%
+    dplyr::mutate(
+        weekend = format(Date, "%u") %in% c(6,7)
+    )
+
 # Mutate gold df -------------------------------
 gold_df <- gold_df %>%
-    dplyr::filter(!is.na(USD..PM.)) %>%
     dplyr::mutate(
-        differences = (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100,
-        log_differences = log(USD..PM. / shift(USD..PM., n = 1)),
-        Date = lubridate::mdy(Date)
+        differences = dplyr::case_when( 
+            shift(weekend, n = 1) == TRUE ~ (USD..PM. - shift(USD..PM., n = 3)) / USD..PM. * 100 / 3,
+            shift(weekend, n = 1) == FALSE ~ (USD..PM. - shift(USD..PM., n = 1)) / USD..PM. * 100
+        ),
+        log_differences = dplyr::case_when(
+            shift(weekend, n = 1) == TRUE ~ log(USD..PM. / shift(USD..PM., n = 3) / 3),
+            shift(weekend, n = 1) == FALSE ~ log(USD..PM. / shift(USD..PM., n = 1))
+        )
     )
 
 
 
 # Calculate volatility using difference columns
-gold_vol <- calc_vol(gold_df)
-gold_log_vol <- calc_vol(gold_df, log = TRUE)
+gold_vol <- calc_vol(gold_df, gold = TRUE)
+gold_log_vol <- calc_vol(gold_df, log = TRUE, gold = TRUE)
 # Calculate mu and sigma
 gold_mu_sigma_df <- calc_mu_and_sigma(gold_df$USD..PM.)
 
@@ -34,19 +54,6 @@ gold_df <- gold_df %>%
         mu = gold_mu_sigma_df$mu_vec,
         sigma = gold_mu_sigma_df$sigma_vec
         )
-
-# Complete adds in NA values for all missing dates.
-gold_df <- gold_df %>%
-    tidyr::complete(
-        Date = seq.Date(
-            min(Date), 
-            max(Date), 
-            by = "day"
-        )
-    ) %>%
-    dplyr::mutate(
-        weekend = format(Date, "%u") %in% c(6,7)
-    )
 
 # Variables -------
 cumulative_mu <- cumsum(tidyr::replace_na(gold_df$mu, replace = 0))
