@@ -33,7 +33,7 @@ def trader_main():
 
         yesterdayPrice = row[2]
         if i >= 2:
-            sigma = (row[9])
+            sigma = (row[9] / i)
             yesterdayMu = (row[8] / i )
         
         sigmas.append(sigma)     

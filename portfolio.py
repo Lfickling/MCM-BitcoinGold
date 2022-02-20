@@ -29,7 +29,8 @@ class Portfolio():
 
         return self.portfolio
 
-def trader_main(): 
+#def trader_main(): 
 
-if __name__ == '__main__':
-    trader_main()
+
+#if __name__ == '__main__':
+ #   trader_main()
