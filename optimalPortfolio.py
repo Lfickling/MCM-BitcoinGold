@@ -28,10 +28,10 @@ class Portfolio():
     #maxSortStats = []
     #maxSortStatsTomorrow = []
     
-    def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, goldDay = False): #N = trading day
-        if  not goldDay: 
+    def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, noGoldDay = False): #N = trading day
+        if  noGoldDay: 
             print(currentAlocation)
-            maxSortToday = self.simulationsNoGold(returns, N)
+            maxSortToday = self.simulationsNoGold(returns, N, currentAlocation, capital, prices, True)
             dailyOptimalRatios.append(maxSortToday[5:8])
             
             maxSortTomorrow = self.simulationsNoGold(expectedReturns, N, currentAlocation, capital, prices)
@@ -39,7 +39,7 @@ class Portfolio():
             print(self.maxSortTomorrow)
             
         else:
-            maxSortToday = self.simulations(returns, N)
+            maxSortToday = self.simulations(returns, N, currentAlocation, capital, prices, True)
             dailyOptimalRatios.append(maxSortToday[5:8])
             
             maxSortTomorrow = self.simulations(expectedReturns, N, currentAlocation, capital, prices)
@@ -54,7 +54,7 @@ class Portfolio():
 
         return self.maxSortAloTomorrow
 
-    def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0]): #n=trading day
+    def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0], justSortino = False): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
         num_runs = 100 # number of rows/iterations
 
@@ -92,7 +92,7 @@ class Portfolio():
 
         #solve adjusted distance (trading cost) between simulatedAlo(1) and realAlo(0), if x is Bit and y is gold: distance = 2|x1-x0| + |y1-y0|
             tradingCost = 0
-            if currentAlo != [0]:
+            if not justSortino:
                 #trading cost
                 x = abs(currentAlo[1] - (weights[1] * capital)) / prices[1]
                 y = abs(currentAlo[2] - (weights[2] * capital)) / prices[2]
@@ -122,7 +122,7 @@ class Portfolio():
         
         maxIndex = int(result['Sortino'].idxmax())
         bestRow = result.loc[maxIndex].to_list()
-        if currentAlo != [0]:
+        if not justSortino:
             max_Sortino = bestRow[4]
             min_Sortino = result['Sortino'].min()
             result['NormedSortino'] = ((result.Sortino - min_Sortino) / (max_Sortino - min_Sortino))

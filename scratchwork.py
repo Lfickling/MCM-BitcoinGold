@@ -1,12 +1,23 @@
-import numpy as np
 
+from cmath import sqrt
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from optimalPortfolio import Portfolio
+from projReturn import ProjReturn
 
 def scratch_main(): 
-    weights = np.random.dirichlet(np.ones(3), size =1)[0].tolist()
-    #weights1 = weights[0].tolist()
-    print(weights)
+    #bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_dfnew.csv')
+    goldDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/gold_dfnew.csv')
 
-    print(sum(weights))
+    for i in range(4,5):
+        #rowB = bitcoinDF.loc[i].to_list()
+        rowG = goldDF.loc[i].to_list()
+        print(rowG)
+    if rowG[12]:
+        print('a bool')
+    else:
+        print('not')
 
 
 if __name__ == '__main__':
