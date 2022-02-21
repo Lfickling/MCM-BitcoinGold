@@ -92,9 +92,9 @@ def day_main():
         prices = [1, rowB[2], rowG[2]]
 
         if i <= 1:
-            sigmas[1, 2] = 0, 0
-            mus[1, 2] = 0, 0
-            prices[1, 2] = priceB, priceG
+            sigmas[1], sigmas[2] = 0, 0
+            mus[1], mus[2] = 0, 0
+            prices[1], prices[2] = priceB, priceG
 
         expectedReturns = [0, 0, 0]
 
@@ -113,7 +113,7 @@ def day_main():
         if rowG[11] is True:
             portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1, True)
         else:
-            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1)
+            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1, False)
         #send data to optimalportfolio
         proportialAlo = portfolio.getOptimalPortfolio()
 

@@ -18,7 +18,6 @@ from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from unused.portfolio import Portfolio
 from projReturn import ProjReturn
 
 dailyOptimalRatios = []
