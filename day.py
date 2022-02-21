@@ -5,6 +5,16 @@ import pandas as pd
 from optimalPortfolio import Portfolio
 from projReturn import ProjReturn
 
+
+priceB = 621
+priceG = 1324.6
+
+alocations = [[0, 1000, 0]]
+proportionalAlocations = [0, 1, 0]
+totalCapital = [1000.00]
+comparedReturns= {"date":[],"realB":[], "projectedB":[0],"realG":[], "projectedG":[0]}
+expectedReturnRate = [0]
+
 def calculateTotalCapital(allocation, prices):
     capital = 0
     for i in range(3):
@@ -23,20 +33,50 @@ def getProportionalAllocation(allocation, totalCapital):
         portfolio[i] =  totalCapital / allocation[i]
     return portfolio
 
-def day_main():
+def getPlots(start, stop):
+    comparedReturnsDF = pd.DataFrame(comparedReturns)
 
+    #graph optimal returns compared to real returns
+    #other graphs
+    # print results tables
+    # print(comparedReturnsDF)
+    
+    ax = plt.gca() 
+    comparedReturnsDF[start:stop].plot(kind = 'line',
+            x = 'date',
+            y = 'realB',
+            color = 'green',ax = ax)
+    comparedReturnsDF[start:stop].plot(kind = 'line',x = 'date',
+            y = 'projectedB',
+            color = 'blue',ax = ax)
+    comparedReturnsDF[start:stop].plot(kind = 'line',x = 'date',
+            y = 'realG',
+            color = 'blue',ax = ax)
+    comparedReturnsDF[start:stop].plot(kind = 'line',x = 'date',
+            y = 'projectedG',
+            color = 'blue',ax = ax)
+      
+    # set the title
+    plt.title('GMB expected Return vs. Real Return')
+    
+    # save the plot
+    plt.savefig("GBM_expected_vs_real.jpg")
+
+    #show the plot
+    plt.show()
+
+def day_main():
+    """
     #comparedReturns = {"date":[],"real":[], "projected":[]}
     #sigmas =  []
     priceB = 621
     priceG = 1324.6
-    length = 60
-
     alocations = [[0, 1000, 0]]
     proportionalAlocations = [0, 1, 0]
     totalCapital = [1000.00]
-    comparedReturnsB= {"date":[],"real":[], "projected":[0]}
-    comparedReturnsG = {"date":[],"real":[], "projected":[0]}
-    
+    comparedReturns= {"date":[],"realB":[], "projectedB":[0],"realG":[], "projectedG":[0]}
+    """
+    length = 20
 
     bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
     goldDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
@@ -64,18 +104,18 @@ def day_main():
         RowReturnerG = ProjReturn(sigmas[1], mus[2], prices[2]) #sigma (or sigma hat), mu, value(price)
         expectedReturns[2] = RowReturnerG.getReturn()
 
-        comparedReturnsB["date"].append(date)
-        comparedReturnsB["real"].append(prices[1])
-        comparedReturnsB["projected"].append(expectedReturns[1])
+        comparedReturns["date"].append(date)
+        comparedReturns["realB"].append(prices[1])
+        comparedReturns["projectedB"].append(RowReturnerB.getProjPrice)
+        comparedReturns["realG"].append(prices[2])
+        comparedReturns["projectedG"].append(RowReturnerG.getProjPrice)
 
-        comparedReturnsG["date"].append(date)
-        comparedReturnsG["real"].append(prices[2])
-        comparedReturnsG["projected"].append(expectedReturns[2])
-
-             
-        portfolio = Portfolio(expectedReturns, mus, i+1)
+        if rowG[11] is True:
+            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1, True)
+        else:
+            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1)
         #send data to optimalportfolio
-        proportialAlo = portfolio.getOptimalPortfolio(sigmas, proportionalAlocations[i], prices)
+        proportialAlo = portfolio.getOptimalPortfolio()
 
         #change proportional to actual based on capital and price
         realAlo = calculateActualAllocation(proportialAlo, totalCapital, prices)
@@ -87,9 +127,8 @@ def day_main():
         #call calctotalcapital and update
         totalCapital.append(calculateTotalCapital(realAlo, prices)) 
     
-    #comparedReturnsDF = pd.DataFrame(comparedReturns)
+    getPlots(5, 15)
 
-    #graph optimal returns compared to real returns
 
 if __name__ == '__main__':
     day_main()

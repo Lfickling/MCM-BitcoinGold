@@ -10,6 +10,8 @@ class ProjReturn():
     sigma = 0
     mu = 0
     averageReturn = 0
+    averageTomorrowPrice = 0
+    
 
     def __init__(self,sigma=0.0, mu=0.0, price = 0.0, k = 10000):
         self.sigma = sigma
@@ -17,8 +19,8 @@ class ProjReturn():
         sumReturns = 0
         for i in range(k):
             sumReturns += self.getPriceInstance(price)
-        averageTomorrowPrice = sumReturns / k
-        self.averageReturn = (averageTomorrowPrice - price) / price
+        self.averageTomorrowPrice = sumReturns / k
+        self.averageReturn = (self.averageTomorrowPrice - price) / price
         #print("mu is ", self.mu)
         #print("sigma is ", self.sigma)
         #print("price is ", price)
@@ -33,5 +35,8 @@ class ProjReturn():
         
     def getReturn(self):
         return self.averageReturn
+    
+    def getProjPrice(self):
+        return self.averageTomorrowPrice
     
     
