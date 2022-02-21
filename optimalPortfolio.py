@@ -22,7 +22,7 @@ from projReturn import ProjReturn
 
 
 # of simulation runs
-num_runs = 100
+num_runs = 1000
 
 class Portfolio():
 
@@ -111,9 +111,9 @@ class Portfolio():
             tradingCost = 0
             if not justSortino:
                 #trading cost
-                x = abs(currentAlo[1] - (weights[1] * capital)) / prices[1]
-                y = abs(currentAlo[2] - (weights[2] * capital)) / prices[2]
-                tradingCost = 2*x + y  #maybe 2 times this? have a think!
+                x = abs(currentAlo[1] - (weights[1] * capital)) 
+                y = abs(currentAlo[2] - (weights[2] * capital))
+                tradingCost = (0.2)*x + (0.1)*y  #maybe 2 times this? have a think!
             
                 
                 
@@ -148,7 +148,7 @@ class Portfolio():
             min_distance = result['adjustedDistance'].min()
             result['NormedDistance'] = ((result['adjustedDistance'] - min_distance) / (max_distance - min_distance))
 
-            result['M-Value'] = result['NormedSortino'] - result['NormedDistance']
+            result['M-Value'] = result['NormedSortino'] - (2*result['NormedDistance'])
 
             maxIndex = result['M-Value'].idxmax()
             bestRow = result.loc[maxIndex].to_list()
@@ -204,9 +204,9 @@ class Portfolio():
         #solve adjusted distance (trading cost) between simulatedAlo(1) and realAlo(0), if x is Bit and there is no gold: distance = 2|x1-x0| 
             if not justSortino:
                 #trading cost
-                x = abs(currentAlo[1] - (weights[1]*capital)) / prices[1]
+                x = abs(currentAlo[1] - (weights[1]*capital))
                 
-                tradingCost = 2*x  #maybe 2 times this? have a think!
+                tradingCost = 0.2*x  #maybe 2 times this? have a think!
             
                 
 
@@ -241,7 +241,7 @@ class Portfolio():
             min_distance = result['adjustedDistance'].min()
             result['NormedDistance'] = ((result.adjustedDistance - min_distance) / (max_distance - min_distance))
 
-            result['M-Value'] = result['NormedSortino'] - result['NormedDistance']
+            result['M-Value'] = result['NormedSortino'] - (2 * result['NormedDistance'])
 
             maxIndex = int(result['M-Value'].idxmax())
             bestRow = result.loc[maxIndex].to_list()

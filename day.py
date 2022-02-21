@@ -7,7 +7,7 @@ from projReturn import ProjReturn
 
 
 
-length = 10
+length = 1822
 
 proportionalAlocations = {"date": [], "real_cash": [1, 1, 1, 1], "real_bit": [0, 0, 0, 0], "real_gold": [0, 0, 0, 0]}
 alocations = [[1000, 0, 0], [1000, 0, 0], [1000, 0, 0], [1000, 0, 0]]
@@ -31,13 +31,13 @@ def calculateTotalCapital(allocation):
 def calculateActualAllocation(proportionalAlo, capital, prices):
     portfolio = [0,0,0]
     for i in range(3):
-        portfolio[i] = proportionalAlo[i] * capital / prices[i]
+        portfolio[i] = proportionalAlo[i] * capital
     return portfolio
 
 def getProportionalAllocation(allocation, totalCapital):
     portfolio = [0,0,0]
     for i in range(3):
-        portfolio[i] =  totalCapital / allocation[i]
+        portfolio[i] =  allocation[i] / totalCapital
     return portfolio
 
 def getGoldExpectedVsRealPlot(comparedReturnDF, start, stop):
