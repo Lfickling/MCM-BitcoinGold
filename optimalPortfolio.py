@@ -28,9 +28,9 @@ class Portfolio():
     #maxSortStats = []
     #maxSortStatsTomorrow = []
     
-    def __init__(self, expectedReturns, mus, currentAlocation, prices, capital, N, goldDay): #N = trading day
+    def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, goldDay): #N = trading day
         if not goldDay: 
-            maxSortToday = self.simulations(mus, N)
+            maxSortToday = self.simulations(returns, N)
             dailyOptimalRatios.append(maxSortToday[5:8])
             if N > 1:
                 maxSortTomorrow = self.simulations(expectedReturns, N+1, currentAlocation, capital, prices)
@@ -39,7 +39,7 @@ class Portfolio():
                 self.maxSortAloTomorrow = maxSortToday[5:8]
         
         else:
-            maxSortToday = self.simulationsNoGold(mus, N)
+            maxSortToday = self.simulationsNoGold(returns, N)
             dailyOptimalRatios.append(maxSortToday[5:8])
             if N > 1:
                 maxSortTomorrow = self.simulationsNoGold(expectedReturns, N+1, currentAlocation, capital, prices)
@@ -55,23 +55,27 @@ class Portfolio():
 
         return self.maxSortAloTomorrow
 
-    def simulations(self, mus, N, currentAlo = [0], capital = 0, prices = [0]): #n=trading day
+    def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0]): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
-        num_runs = 10000 # number of rows/iterations
+        num_runs = 100 # number of rows/iterations
 
         # Creating a Matrix with 10000 rows, with each row representing a random portfolio:
         #first 3 columns are Mean Returns, Standard Deviation, and Sortino Ratio
         # remaining columns are each assets random weight within that random portfolio
         result = np.zeros((num_runs,9))
 
-        df = pd.DataFrame()
+        df = pd.DataFrame(returns)
+        #df = np.log(df + 1)
+
+
+        print(df)
 
         for i in range(num_runs):
             
             weights = np.random.dirichlet(np.ones(3), size =1)[0].tolist()
             
             # daily return of the portfolio based on a given set of weights
-            df['portfolio_ret'] = mus[0]*weights[0]+mus[1]*weights[1]+mus[2]*weights[2]
+            df['portfolio_ret'] = df.iloc[:,0]*weights[0]+df.iloc[:,1]*weights[1]+df.iloc[:,2]*weights[2]
             
             # Calculating Mean
             E = df['portfolio_ret'].mean()
@@ -86,16 +90,19 @@ class Portfolio():
             volSkew = std_pos/std_neg
             
             # Sortino
-            Sortino = E/std_neg
+            sortino = E/std_neg
 
             
 
         #solve adjusted distance (trading cost) between simulatedAlo(1) and realAlo(0), if x is Bit and y is gold: distance = 2|x1-x0| + |y1-y0|
+            tradingCost = 0
             if currentAlo != [0]:
                 #trading cost
                 x = abs(currentAlo[1] - (weights[1]*capital)) / prices[1]
                 y = abs(currentAlo[2] - (weights[2]*capital)) / prices[2]
                 tradingCost = 2*x + y  #maybe 2 times this? have a think!
+            
+                
                 
 
             # Populating the 'result' array with the required values: Mean, SD, Sharpe followed by the weights                   
@@ -103,7 +110,8 @@ class Portfolio():
             result[i,1] = std_neg
             result[i,2] = std_pos
             result[i,3] = volSkew
-            result[i,4] = Sortino
+            result[i,4] = sortino
+            result[i,8] = tradingCost
             
             for j in range(3):
                 result[i,j+5]= weights[j]
@@ -115,19 +123,22 @@ class Portfolio():
         #maybe norm[sortino] + norm[adjusteddistance]?
         #our selection optimal alocation ratio is the one associated with highest M
         #M-value (which one to pick?) a function of sortino and adjusted distance
-        bestRow = result.iloc[result['Sortino'].idxmax()]
+        
+        maxIndex = int(result['Sortino'].idxmax())
+        bestRow = result.iloc[maxIndex]
         if N > 1:
             max_Sortino = bestRow[4]
-            min_Sortino = result.iloc[result['Sortino'].idxmin()][4]
+            min_Sortino = result['Sortino'].min()
             result['NormedSortino'] = ((result.Sortino - min_Sortino) / (max_Sortino - min_Sortino))
 
-            max_distance = result.iloc[result['adjustedDistance'].idxmin()][8]
-            min_distance = result.iloc[result['adjustedDistance'].idxmin()][8]
+            max_distance = result['adjustedDistance'].max()
+            min_distance = result['adjustedDistance'].min()
             result['NormedDistance'] = ((result.adjustedDistance - min_distance) / (max_distance - min_distance))
 
-            result['M-Value'] = result.NormedSortino + result.NormedDistance
+            result['M-Value'] = result['NormedSortino'] + result['NormedDistance']
 
-            bestRow = result.iloc[result['M-Value'].idxmax()]
+            maxIndex = result['M-Value'].idxmax()
+            bestRow = result.iloc[maxIndex]
 
         #get plots we need
         if N == 3:
@@ -135,16 +146,19 @@ class Portfolio():
 
         return bestRow
 
-    def simulationsNoGold(self, mus, N, currentAlo = [0], capital = 1000, prices = [0]): #n=trading day
+    def simulationsNoGold(self, returns, N, currentAlo = [0], capital = 1000, prices = [0]): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
-        num_runs = 10000 # number of rows/iterations
+        num_runs = 100 # number of rows/iterations
 
         # Creating a Matrix with 10000 rows, with each row representing a random portfolio:
         #first 3 columns are Mean Returns, Standard Deviation, and Sortino Ratio
         # remaining columns are each assets random weight within that random portfolio
         result = np.zeros((num_runs,9))
 
-        df = pd.DataFrame()
+        df = pd.DataFrame(returns)
+        df = np.log(df/df.shift(1))
+
+        df
 
         for i in range(num_runs):
             
@@ -154,7 +168,7 @@ class Portfolio():
             weights.append(goldWeight)
             
             # daily return of the portfolio based on a given set of weights (with no gold)
-            df['portfolio_ret'] = mus[0]*weights[0]+mus[1]*weights[1]
+            df['portfolio_ret'] = df.iloc[:,0]*weights[0]+df.iloc[:,1]*weights[1]
             
             # Calculating Mean
             E = df['portfolio_ret'].mean()
@@ -169,16 +183,17 @@ class Portfolio():
             volSkew = std_pos/std_neg
             
             # Sortino
-            Sortino = E/std_neg
+            sortino = E/std_neg
 
             
-
+            tradingCost = 0
         #solve adjusted distance (trading cost) between simulatedAlo(1) and realAlo(0), if x is Bit and there is no gold: distance = 2|x1-x0| 
             if currentAlo != [0]:
                 #trading cost
                 x = abs(currentAlo[1] - (weights[1]*capital)) / prices[1]
                 
                 tradingCost = 2*x  #maybe 2 times this? have a think!
+            
                 
 
             # Populating the 'result' array with the required values: Mean, SD, Sharpe followed by the weights                   
@@ -186,7 +201,8 @@ class Portfolio():
             result[i,1] = std_neg
             result[i,2] = std_pos
             result[i,3] = volSkew
-            result[i,4] = Sortino
+            result[i,4] = sortino
+            result[i,8] = tradingCost
             
             for j in range(3):
                 result[i,j+5]= weights[j]
@@ -198,20 +214,22 @@ class Portfolio():
         #maybe norm[sortino] + norm[adjusteddistance]?
         #our selection optimal alocation ratio is the one associated with highest M
         #M-value (which one to pick?) a function of sortino and adjusted distance
-        bestRow = result.iloc[result['Sortino'].idxmax()]
-
+        maxIndex = result['Sortino'].idxmax()
+        bestRow = result.iloc[[maxIndex]]
         if N > 1:
             max_Sortino = bestRow[4]
-            min_Sortino = result.iloc[result['Sortino'].idxmin()][4]
+            min_Sortino = result['Sortino'].min()
             result['NormedSortino'] = ((result.Sortino - min_Sortino) / (max_Sortino - min_Sortino))
 
-            max_distance = result.iloc[result['adjustedDistance'].idxmin()][8]
-            min_distance = result.iloc[result['adjustedDistance'].idxmin()][8]
+            max_distance = result['adjustedDistance'].max()
+            min_distance = result['adjustedDistance'].min()
             result['NormedDistance'] = ((result.adjustedDistance - min_distance) / (max_distance - min_distance))
 
-            result['M-Value'] = result.NormedSortino + result.NormedDistance
+            result['M-Value'] = result['NormedSortino'] + result['NormedDistance']
 
-            bestRow = result.iloc[result['M-Value'].idxmax()]
+            maxIndex = result['M-Value'].idxmax()
+            bestRow = result.iloc[[maxIndex]]
+
 
         #get plots we need
         if N == 3:

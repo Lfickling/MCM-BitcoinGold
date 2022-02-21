@@ -9,11 +9,13 @@ from projReturn import ProjReturn
 priceB = 621
 priceG = 1324.6
 
-alocations = [[0, 1000, 0]]
-proportionalAlocations = [0, 1, 0]
-totalCapital = [1000.00]
-comparedReturns= {"date":[],"realB":[], "projectedB":[0],"realG":[], "projectedG":[0]}
-expectedReturnRate = [0]
+alocations = [[0, 1000, 0], [0, 1000, 0], [0, 1000, 0]]
+proportionalAlocations = [[0, 1, 0], [0, 1, 0]], [0, 1, 0]
+totalCapital = [1000.00, 1000.00, 1000.00]
+comparedReturns= {"date":[],"realB":[621.65, 609.67], "projectedB":[0, 0, 0],"realG":[1324.6, 1324.6], "projectedG":[0, 0, 0]}
+expectedReturnRates = []
+#historicReturns = [[0, 0, 0], [0, -11.98, 0]]
+#yesterdayPrices = [1, 609.67, 1324.6]
 
 def calculateTotalCapital(allocation, prices):
     capital = 0
@@ -76,12 +78,17 @@ def day_main():
     totalCapital = [1000.00]
     comparedReturns= {"date":[],"realB":[], "projectedB":[0],"realG":[], "projectedG":[0]}
     """
+    historicReturns = [[0, -11.98, 0]]
+    yesterdayPrices = [1, 609.67, 1324.6]
     length = 20
 
     bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
     goldDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_df.csv')
 
-    for i in range(0,length):
+    comparedReturns["date"].append(bitcoinDF.iloc[0,1])
+    comparedReturns["date"].append(bitcoinDF.iloc[1,1])
+
+    for i in range(2,length):
 
         rowB = bitcoinDF.loc[i].to_list()
         rowG = goldDF.loc[i].to_list()
@@ -90,11 +97,6 @@ def day_main():
         sigmas = [0, rowB[10], rowG[10]]
         mus = [0, rowB[9], rowG[9]]
         prices = [1, rowB[2], rowG[2]]
-
-        if i <= 1:
-            sigmas[1], sigmas[2] = 0, 0
-            mus[1], mus[2] = 0, 0
-            prices[1], prices[2] = priceB, priceG
 
         expectedReturns = [0, 0, 0]
 
@@ -110,10 +112,13 @@ def day_main():
         comparedReturns["realG"].append(prices[2])
         comparedReturns["projectedG"].append(RowReturnerG.getProjPrice)
 
+        historicReturns.append([0, (prices[1] -yesterdayPrices[1]), (prices[2] -yesterdayPrices[2])])
+        expectedReturnRates = historicReturns.append(expectedReturns)
+
         if rowG[11] is True:
-            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1, True)
+            portfolio = Portfolio(expectedReturnRates, historicReturns, alocations[i], prices, totalCapital[i], i+1, True)
         else:
-            portfolio = Portfolio(expectedReturns, mus, alocations[i], prices, totalCapital[i], i+1, False)
+            portfolio = Portfolio(expectedReturnRates, historicReturns, alocations[i], prices, totalCapital[i], i+1, False)
         #send data to optimalportfolio
         proportialAlo = portfolio.getOptimalPortfolio()
 
@@ -126,6 +131,8 @@ def day_main():
 
         #call calctotalcapital and update
         totalCapital.append(calculateTotalCapital(realAlo, prices)) 
+
+        yesterdayPrices = prices
     
     getPlots(5, 15)
 
