@@ -20,21 +20,24 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from projReturn import ProjReturn
 
-dailyOptimalAlo = [[1000, 0, 0]]
-dailySortinos = []
+
 # of simulation runs
 num_runs = 100
 
 class Portfolio():
 
     maxSortAloTomorrow = []
+    trading_costs = 0
+    dailyOptimalAlo = []
+    sortino = 0
     #maxSortStats = []
     #maxSortStatsTomorrow = []
     
     def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, noGoldDay = False): #N = trading day
+        
         if  noGoldDay: 
             maxSortToday = self.simulationsNoGold(returns, N, currentAlocation, capital, prices, True)
-            dailyOptimalAlo.append(maxSortToday[5:8])
+            self.dailyOptimalAlo = maxSortToday[5:8]
             
             maxSortTomorrow = self.simulationsNoGold(expectedReturns, N, currentAlocation, capital, prices)
             self.maxSortAloTomorrow = maxSortTomorrow[5:8]
@@ -42,12 +45,13 @@ class Portfolio():
             
         else:
             maxSortToday = self.simulations(returns, N, currentAlocation, capital, prices, True)
-            dailyOptimalAlo.append(maxSortToday[5:8])
+            self.dailyOptimalAlo = maxSortToday[5:8]
             
             maxSortTomorrow = self.simulations(expectedReturns, N, currentAlocation, capital, prices)
             self.maxSortAloTomorrow = maxSortTomorrow[5:8]
-            
-        dailySortinos.append(maxSortTomorrow[4])
+
+        self.trading_costs = maxSortTomorrow[8] 
+        self.sortino = maxSortTomorrow[4]
         #self.maxSortStats = maxSortToday[:5]
         #self.maxSortStatsTomorrow = maxSortTomorrow[:5]
 
@@ -58,11 +62,14 @@ class Portfolio():
 
     def getDailyOptimalAlo(self):
 
-        return dailyOptimalRatios
+        return self.dailyOptimalAlo
 
-    def getSortinos():
+    def getSortino(self):
 
-        return dailySortinos
+        return self.sortino
+    
+    def getTradingCosts(self):
+        return self.trading_costs
     
     def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0], justSortino = False): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
@@ -165,12 +172,11 @@ class Portfolio():
         df = pd.DataFrame(returns)
         #df = np.log(df/df.shift(1))
 
+        goldWeight = (currentAlo[2] / capital)
 
         for i in range(num_runs):
             
             #weights with gold fixed
-            goldWeight = (currentAlo[2] / capital)
-
             weights = np.random.dirichlet(np.ones(2), size =1)[0].tolist()
             weights = [weight * (1-goldWeight) for weight in weights]
             weights.append(goldWeight)
