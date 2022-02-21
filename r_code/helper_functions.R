@@ -11,25 +11,33 @@ calc_vol <- function(df, log = FALSE, gold = FALSE) {
             diff_vec <- df$differences
             
             for (i in 1:nrow(df)) {
-                    if ( i > 1 && weekend[i] == FALSE && weekend[i-1] == TRUE ) {
-                        #print("Today is monday")
-                        new_val <- c(sd(c(diff_vec[i], diff_vec[i-3])))
-                        ret_val <- c(ret_val, new_val)
-                    }
+                if ( i > 1 && !is.na(df$USD..PM.[i]) && weekend[i] == FALSE && weekend[i-1] == TRUE ) {
+                    #print("Today is monday")
                     
-                    else{
-                        new_val <- c(sd(c(diff_vec[i], diff_vec[i-1])))
-                        ret_val <- c(ret_val, new_val)
-                    }
+                    new_val <- c(sd(c(diff_vec[i], diff_vec[i-3])))
+                    ret_val <- c(ret_val, new_val)
+                }
+                
+                else {
+                    new_val <- c(sd(c(diff_vec[i], diff_vec[i-1])))
+                    ret_val <- c(ret_val, new_val)
+                }
             }
         }
+        
         else {
             log_diff_vec <- df$log_differences
             
             for (i in 1:nrow(df)) {
                 if ( i > 1 && weekend[i] == FALSE && weekend[i-1] == TRUE ) {
                     #print("Today is monday")
-                    new_val <- c(sd(c(log_diff_vec[i], log_diff_vec[i-3])))
+                    
+                    m <- 3
+                    while (is.na(log_diff_vec[i-m])) {
+                        m <- m+1
+                    }
+                    
+                    new_val <- c(sd(c(log_diff_vec[i], log_diff_vec[i-m])))
                     ret_val <- c(ret_val, new_val)
                 }
                 
