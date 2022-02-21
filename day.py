@@ -5,8 +5,7 @@ import pandas as pd
 from optimalPortfolio import Portfolio
 from projReturn import ProjReturn
 
-
-
+#how many does should it run for: should be no more than # of rows - 3
 length = 1822
 
 proportionalAlocations = {"date": [], "real_cash": [1, 1, 1, 1], "real_bit": [0, 0, 0, 0], "real_gold": [0, 0, 0, 0]}
@@ -144,6 +143,12 @@ def day_main():
     proportionalAlocations["date"].append(bitcoinDF.iloc[3,2])
 
     for i in range(3,length):
+
+        #time checkers during runtime
+        if i == length//3:
+            print('1/3 done')
+        if i == 2*length//3:
+            print('2/3 done')
 
         rowB = bitcoinDF.loc[i].to_list()
         rowG = goldDF.loc[i].to_list()
