@@ -1,5 +1,6 @@
-bitcoin_df <- read.csv("bitcoin_df")
-gold_df <- read.csv("gold_df")
+library(ggplot2)
+bitcoin_df <- read.csv("data_frames/bitcoin_df.csv")
+gold_df <- read.csv("data_frames/gold_df.csv")
 
 # ------------------[ LINE PLOTS ]----------------------
 # -------[ BITCOIN PLOTS ]------------ 
@@ -93,3 +94,31 @@ ggplot2::ggplot(data = gold_df) +
     xlab("Return (%)") +
     ylab("Frequency") +
     theme_gray()
+
+# --------------[ DENSITY PLOT ]-----------------------
+
+# Bitcoin Density plot -----
+ggplot2::ggplot(data = bitcoin_df, mapping = aes(x = differences)) +
+    ggplot2::geom_density() +
+    xlab("Returns (%)") +
+    labs(title = "Probability Distribution of Bitcoin Returns") +
+    scale_x_continuous(
+        limits = c(-13,13),
+        breaks = c(-3:3 * sd(bitcoin_df$differences, na.rm = TRUE) + mean(bitcoin_df$differences, na.rm = TRUE)),
+        labels = c("\u03BC - 3\u03C3", "\u03BC - 2\u03C3", "\u03BC - \u03C3", "\u03BC", "\u03BC + \u03C3", "\u03BC + 2\u03C3", "\u03BC + 3\u03C3")
+    ) +
+    theme(axis.text.x = element_text(size=12),
+          axis.title.y = element_blank())
+
+# Gold Density plot -----
+ggplot2::ggplot(data = gold_df, mapping = aes(x = differences)) +
+    ggplot2::geom_density() +
+    xlab("Returns (%)") +
+    labs(title = "Probability Distribution of Gold Returns") +
+    scale_x_continuous(
+        limits = c(-2.5,2.5),
+        breaks = c(-3:3 * sd(gold_df$differences, na.rm = TRUE) + mean(gold_df$differences, na.rm = TRUE)),
+        labels = c("\u03BC - 3\u03C3", "\u03BC - 2\u03C3", "\u03BC - \u03C3", "\u03BC", "\u03BC + \u03C3", "\u03BC + 2\u03C3", "\u03BC + 3\u03C3")
+    ) +
+    theme(axis.text.x = element_text(size=12),
+          axis.title.y = element_blank())
