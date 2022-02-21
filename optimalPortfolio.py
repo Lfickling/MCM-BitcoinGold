@@ -18,20 +18,32 @@ from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from portfolio import Portfolio
+from unused.portfolio import Portfolio
 from projReturn import ProjReturn
 
 class Portfolio():
 
     portfolio = []
+    maxSortAloToday = []
+    maxSortTomorrow = []
+    #maxSortStats = []
+    #maxSortStatsTomorrow = []
     
-    def __init__(self, expectedReturns, risks, currentCapital, currentAlocation, currentPrices, mus, N):
+    def __init__(self, expectedReturns, mus, N):
 
-        maxSortinoToday = self.simulations(mus, N)
-        maxSortinoTomorrow = self.simulations(expectedReturns, N+1)
+        maxSortToday = self.simulations(mus, N)
+        maxSortTomorrow = self.simulations(expectedReturns, N+1)
+        self.maxSortAloToday = maxSortToday[5:]
+        self.maxSortAloTomorrow = maxSortTomorrow[5:]
+
+        #self.maxSortStats = maxSortToday[:5]
+        #self.maxSortStatsTomorrow = maxSortTomorrow[:5]
 
 
-    def getOptimalPortfolio(self):
+    def getOptimalPortfolio(self, risks, currentAlocation, currentPrices, N):
+        #here we decide which portfolio to use and return it
+        
+
         return self.portfolio
 
     def simulations(mus, N): #n=trading day
@@ -85,29 +97,9 @@ class Portfolio():
 
         Max_Sortino = result.iloc[result['Sortino'].idxmax()]
 
-        return result
+        return Max_Sortino
     
-    def plotMinsMaxs(result):
-        Max_Sortino = result.iloc[result['Sortino'].idxmax()]
-        Max_Sortino
-
-        Min_DSD = result.iloc[result['Downside SD'].idxmin()]
-        Min_DSD
-
-        min_skew = result.iloc[result['Volatility Skewness'].idxmin()]
-        min_skew
-
-        max_skew = result.iloc[result['Volatility Skewness'].idxmax()]
-        max_skew
-
-        max_mean = result.iloc[result['Mean'].idxmax()]
-        max_mean
-
-        max_UP = result.iloc[result['Upside SD'].idxmax()]
-        max_UP
-
-        min_skew = result.iloc[result['Volatility Skewness'].idxmin()]
-        min_skew
+    def plotMinsMaxs(self, result):
 
         plt.figure(figsize=(12,8))
         plt.scatter(x=result['Downside SD'],y=result['Mean'],c=result['Sortino'],cmap='viridis')

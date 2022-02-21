@@ -17,6 +17,12 @@ def calculateActualAllocation(ProportionalAllocation, totalCapital, prices):
         portfolio[i] = ProportionalAllocation[i] * totalCapital * prices[i]
     return portfolio
 
+def getProportionalAllocation(allocation, totalCapital):
+    portfolio = [0,0,0]
+    for i in range(3):
+        portfolio[i] =  totalCapital / allocation[i]
+    return portfolio
+
 def day_main():
 
     #comparedReturns = {"date":[],"real":[], "projected":[]}
@@ -26,6 +32,7 @@ def day_main():
     length = 60
 
     alocations = [[0, 1000, 0]]
+    proportionalAlocations = [0, 1, 0]
     totalCapital = [1000.00]
     comparedReturnsB= {"date":[],"real":[], "projected":[0]}
     comparedReturnsG = {"date":[],"real":[], "projected":[0]}
@@ -66,20 +73,23 @@ def day_main():
         comparedReturnsG["projected"].append(expectedReturns[2])
 
              
-        portfolio = Portfolio(expectedReturns, sigmas, totalCapital, alocations[i], prices, mus, i+1)
+        portfolio = Portfolio(expectedReturns, mus, i+1)
         #send data to optimalportfolio
-        proportialAlo = portfolio.getOptimalPortfolio()
+        proportialAlo = portfolio.getOptimalPortfolio(sigmas, proportionalAlocations[i], prices)
 
         #change proportional to actual based on capital and price
         realAlo = calculateActualAllocation(proportialAlo, totalCapital, prices)
 
         #append alocations with new alocations
+        proportionalAlocations.append(proportialAlo)
         alocations.append(realAlo)
 
         #call calctotalcapital and update
         totalCapital.append(calculateTotalCapital(realAlo, prices)) 
     
     #comparedReturnsDF = pd.DataFrame(comparedReturns)
+
+    #graph optimal returns compared to real returns
 
 if __name__ == '__main__':
     day_main()

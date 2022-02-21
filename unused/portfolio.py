@@ -1,3 +1,4 @@
+"""
 from random import uniform
 
 class Portfolio():
@@ -34,3 +35,5 @@ class Portfolio():
 
 #if __name__ == '__main__':
  #   trader_main()
+
+"""
