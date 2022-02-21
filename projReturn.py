@@ -18,7 +18,7 @@ class ProjReturn():
         for i in range(k):
             sumReturns += self.getPriceInstance(price)
         averageTomorrowPrice = sumReturns / k
-        averageReturn = averageTomorrowPrice - price
+        self.averageReturn = (averageTomorrowPrice - price) / price
         #print("mu is ", self.mu)
         #print("sigma is ", self.sigma)
         #print("price is ", price)

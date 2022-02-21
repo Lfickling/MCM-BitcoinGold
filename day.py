@@ -2,7 +2,7 @@ from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from portfolio import Portfolio
+from optimalPortfolio import Portfolio
 from projReturn import ProjReturn
 
 def calculateTotalCapital(allocation, prices):
@@ -49,21 +49,24 @@ def day_main():
             mus[1, 2] = 0, 0
             prices[1, 2] = priceB, priceG
 
+        expectedReturns = [0, 0, 0]
+
         RowReturnerB = ProjReturn(sigmas[1], mus[1], prices[1]) #sigma (or sigma hat), mu, value(price)
-        projectedReturnB = RowReturnerB.getReturn()
+        expectedReturns[1] = RowReturnerB.getReturn()
         
         RowReturnerG = ProjReturn(sigmas[1], mus[2], prices[2]) #sigma (or sigma hat), mu, value(price)
-        projectedReturnG = RowReturnerG.getReturn()
+        expectedReturns[2] = RowReturnerG.getReturn()
 
         comparedReturnsB["date"].append(date)
         comparedReturnsB["real"].append(prices[1])
-        comparedReturnsB["projected"].append(projectedReturnB)
+        comparedReturnsB["projected"].append(expectedReturns[1])
 
         comparedReturnsG["date"].append(date)
         comparedReturnsG["real"].append(prices[2])
-        comparedReturnsG["projected"].append(projectedReturnG)
+        comparedReturnsG["projected"].append(expectedReturns[2])
+
              
-        portfolio = Portfolio()
+        portfolio = Portfolio(expectedReturns, sigmas, totalCapital, alocations[i], prices, mus, i+1)
         #send data to optimalportfolio
         proportialAlo = portfolio.getOptimalPortfolio()
 
