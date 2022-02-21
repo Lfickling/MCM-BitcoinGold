@@ -67,7 +67,8 @@ gold_sigma_hat <- calculate_sigma_hat(sum_of_mu_squared_diff)
 gold_df <- gold_df %>%
     dplyr::mutate(
         cumulative_mu = cumulative_mu,
-        sigma_hat = gold_sigma_hat
+        sigma_hat = gold_sigma_hat,
+        NA_row = is.na(USD..PM.) | is.na(differences) | is.na(log_differences)
     )
 
 sync_day <- data.frame(
@@ -81,7 +82,8 @@ sync_day <- data.frame(
     sigma = NA, 
     weekend = TRUE, 
     cumulative_mu = NA, 
-    sigma_hat = NA)
+    sigma_hat = NA,
+    NA_row = TRUE)
 
 gold_data <- rbind(sync_day, gold_df)
 
