@@ -13,7 +13,7 @@ class ProjReturn():
     averageTomorrowPrice = 0
     
 
-    def __init__(self,sigma=0.0, mu=0.0, price = 0.0, k = 100):
+    def __init__(self,sigma=0.0, mu=0.0, price = 0.0, k = 1000):
         self.sigma = sigma
         self.mu = mu
         sumReturns = 0

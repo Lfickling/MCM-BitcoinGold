@@ -6,13 +6,13 @@ from optimalPortfolio import Portfolio
 from projReturn import ProjReturn
 
 
-priceB = 621
-priceG = 1324.6
+
+length = 20
 
 alocations = [[0, 1000, 0], [0, 1000, 0], [0, 1000, 0], [0, 1000, 0]]
 proportionalAlocations = [[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]
 totalCapital = [1000.00, 1000.00, 1000.00, 1000.00]
-comparedReturns= {"date":[],"realB":[621.65, 609.67], "projectedB":[0, 0, 0, 0],"realG":[1324.6, 1324.6, 1323.65], "projectedG":[0, 0, 0, 0]}
+comparedReturns= {"date":[],"realB":[621.65, 609.67, 610.92], "projectedB":[0, 0, 0, 0],"realG":[1324.6, 1324.6, 1323.65], "projectedG":[0, 0, 0, 0]}
 expectedReturnRates = []
 #historicReturns = [[0, 0, 0], [0, -11.98, 0]]
 #yesterdayPrices = [1, 609.67, 1324.6]
@@ -26,7 +26,7 @@ def calculateTotalCapital(allocation):
 def calculateActualAllocation(proportionalAlo, capital, prices):
     portfolio = [0,0,0]
     for i in range(3):
-        portfolio[i] = proportionalAlo[i] * capital[i] * prices[i]
+        portfolio[i] = proportionalAlo[i] * capital[i] / prices[i]
     return portfolio
 
 def getProportionalAllocation(allocation, totalCapital):
@@ -36,6 +36,7 @@ def getProportionalAllocation(allocation, totalCapital):
     return portfolio
 
 def getPlots(start, stop):
+    print(comparedReturns)
     comparedReturnsDF = pd.DataFrame(comparedReturns)
 
     #graph optimal returns compared to real returns
@@ -80,7 +81,6 @@ def day_main():
     """
     historicReturns = [[0, -11.98, 0]]
     yesterdayPrices = [1, 609.67, 1324.6]
-    length = 20
     yesterdaySigmaG = 0
     yesterdayMuG = 0
 
@@ -100,21 +100,25 @@ def day_main():
             date = rowB[2]
             sigmas = [0, rowB[11], yesterdaySigmaG]
             mus = [0, rowB[10], yesterdayMuG]
-            prices = [1, rowB[3], yesterdayPrices[3]]
+            prices = [1, rowB[3], yesterdayPrices[2]]
 
+            
             expectedReturns = [0, 0, 0]
 
             RowReturnerB = ProjReturn(sigmas[1], mus[1], prices[1]) #sigma (or sigma hat), mu, value(price)
             expectedReturns[1] = RowReturnerB.getReturn()
             
+            
             RowReturnerG = ProjReturn(sigmas[1], mus[2], prices[2]) #sigma (or sigma hat), mu, value(price)
             expectedReturns[2] = RowReturnerG.getReturn()
+            
 
             comparedReturns["date"].append(date)
             comparedReturns["realB"].append(prices[1])
-            comparedReturns["projectedB"].append(RowReturnerB.getProjPrice)
             comparedReturns["realG"].append(prices[2])
-            comparedReturns["projectedG"].append(RowReturnerG.getProjPrice)
+            if i != (length-1):
+                comparedReturns["projectedB"].append(RowReturnerB.getProjPrice())
+                comparedReturns["projectedG"].append(RowReturnerG.getProjPrice())
 
             historicReturns.append([0, (prices[1] -yesterdayPrices[1]), (prices[2] -yesterdayPrices[2])])
             expectedReturnRates = historicReturns 
@@ -127,28 +131,29 @@ def day_main():
             mus = [0, rowB[10], rowG[10]]
             prices = [1, rowB[3], rowG[3]]
             
+            expectedReturnRates = [0, 0, 0]
             expectedReturns = [0, 0, 0]
 
             RowReturnerB = ProjReturn(sigmas[1], mus[1], prices[1]) #sigma (or sigma hat), mu, value(price)
-            expectedReturns[1] = RowReturnerB.getReturn()
+            expectedReturnRates[1] = RowReturnerB.getReturn()
             
             RowReturnerG = ProjReturn(sigmas[1], mus[2], prices[2]) #sigma (or sigma hat), mu, value(price)
-            expectedReturns[2] = RowReturnerG.getReturn()
+            expectedReturnRates[2] = RowReturnerG.getReturn()
 
             comparedReturns["date"].append(date)
             comparedReturns["realB"].append(prices[1])
-            comparedReturns["projectedB"].append(RowReturnerB.getProjPrice)
+            comparedReturns["projectedB"].append(RowReturnerB.getProjPrice())
             comparedReturns["realG"].append(prices[2])
-            comparedReturns["projectedG"].append(RowReturnerG.getProjPrice)
+            comparedReturns["projectedG"].append(RowReturnerG.getProjPrice())
 
             historicReturns.append([0, (prices[1] -yesterdayPrices[1]), (prices[2] -yesterdayPrices[2])])
             expectedReturnRates = historicReturns 
             expectedReturns += expectedReturns
 
-            portfolio = Portfolio(expectedReturnRates, historicReturns, alocations[i], prices, totalCapital[i], i, goldDay =False)
+            portfolio = Portfolio(expectedReturnRates, historicReturns, alocations[i], prices, totalCapital[i], i, noGoldDay=False)
 
-            yesterdayMuG = mus[3]
-            yesterdaySigmaG = sigmas[3]
+            yesterdayMuG = mus[2]
+            yesterdaySigmaG = sigmas[2]
         
         #send data to optimalportfolio
         proportialAlo = portfolio.getOptimalPortfolio()
