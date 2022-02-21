@@ -19,6 +19,9 @@ def scratch_main():
     else:
         print('not')
 
+    for key in comparedReturns:
+        print(len(comparedReturns[key]))
+
 
 if __name__ == '__main__':
     scratch_main()

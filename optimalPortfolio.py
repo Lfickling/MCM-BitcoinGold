@@ -20,7 +20,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from projReturn import ProjReturn
 
-dailyOptimalRatios = []
+dailyOptimalAlo = [[1000, 0, 0]]
+dailySortinos = []
+# of simulation runs
 num_runs = 100
 
 class Portfolio():
@@ -32,7 +34,7 @@ class Portfolio():
     def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, noGoldDay = False): #N = trading day
         if  noGoldDay: 
             maxSortToday = self.simulationsNoGold(returns, N, currentAlocation, capital, prices, True)
-            dailyOptimalRatios.append(maxSortToday[5:8])
+            dailyOptimalAlo.append(maxSortToday[5:8])
             
             maxSortTomorrow = self.simulationsNoGold(expectedReturns, N, currentAlocation, capital, prices)
             self.maxSortAloTomorrow = maxSortTomorrow[5:8]
@@ -40,12 +42,12 @@ class Portfolio():
             
         else:
             maxSortToday = self.simulations(returns, N, currentAlocation, capital, prices, True)
-            dailyOptimalRatios.append(maxSortToday[5:8])
+            dailyOptimalAlo.append(maxSortToday[5:8])
             
             maxSortTomorrow = self.simulations(expectedReturns, N, currentAlocation, capital, prices)
             self.maxSortAloTomorrow = maxSortTomorrow[5:8]
             
-
+        dailySortinos.append(maxSortTomorrow[4])
         #self.maxSortStats = maxSortToday[:5]
         #self.maxSortStatsTomorrow = maxSortTomorrow[:5]
 
@@ -54,6 +56,14 @@ class Portfolio():
 
         return self.maxSortAloTomorrow
 
+    def getDailyOptimalAlo(self):
+
+        return dailyOptimalRatios
+
+    def getSortinos():
+
+        return dailySortinos
+    
     def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0], justSortino = False): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
         

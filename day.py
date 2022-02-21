@@ -7,11 +7,12 @@ from projReturn import ProjReturn
 
 
 
-length = 20
+length = 10
 
-alocations = [[0, 1000, 0], [0, 1000, 0], [0, 1000, 0], [0, 1000, 0]]
-proportionalAlocations = [[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]
+alocations = [[1000, 0, 0], [1000, 0, 0], [1000, 0, 0], [1, 0, 0]]
+proportionalAlocations = [[1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0]]
 totalCapital = [1000.00, 1000.00, 1000.00, 1000.00]
+dailyReturns = {"date":[], "returns": [0, 0, 0, 0]}
 comparedReturns= {"date":[],"realB":[621.65, 609.67, 610.92], "projectedB":[0, 0, 0, 0],"realG":[1324.6, 1324.6, 1323.65], "projectedG":[0, 0, 0, 0]}
 expectedReturnRates = []
 #historicReturns = [[0, 0, 0], [0, -11.98, 0]]
@@ -36,7 +37,7 @@ def getProportionalAllocation(allocation, totalCapital):
     return portfolio
 
 def getPlots(start, stop):
-    print(comparedReturns)
+
     comparedReturnsDF = pd.DataFrame(comparedReturns)
 
     #graph optimal returns compared to real returns
@@ -142,9 +143,10 @@ def day_main():
 
             comparedReturns["date"].append(date)
             comparedReturns["realB"].append(prices[1])
-            comparedReturns["projectedB"].append(RowReturnerB.getProjPrice())
             comparedReturns["realG"].append(prices[2])
-            comparedReturns["projectedG"].append(RowReturnerG.getProjPrice())
+            if i != (length-1):
+                comparedReturns["projectedB"].append(RowReturnerB.getProjPrice())
+                comparedReturns["projectedG"].append(RowReturnerG.getProjPrice())
 
             historicReturns.append([0, (prices[1] -yesterdayPrices[1]), (prices[2] -yesterdayPrices[2])])
             expectedReturnRates = historicReturns 
