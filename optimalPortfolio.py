@@ -28,24 +28,23 @@ class Portfolio():
     #maxSortStats = []
     #maxSortStatsTomorrow = []
     
-    def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, goldDay): #N = trading day
-        if not goldDay: 
-            maxSortToday = self.simulations(returns, N)
-            dailyOptimalRatios.append(maxSortToday[5:8])
-            if N > 1:
-                maxSortTomorrow = self.simulations(expectedReturns, N+1, currentAlocation, capital, prices)
-                self.maxSortAloTomorrow = maxSortTomorrow[5:8]
-            else:
-                self.maxSortAloTomorrow = maxSortToday[5:8]
-        
-        else:
+    def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, goldDay = False): #N = trading day
+        if  not goldDay: 
+            print(currentAlocation)
             maxSortToday = self.simulationsNoGold(returns, N)
             dailyOptimalRatios.append(maxSortToday[5:8])
-            if N > 1:
-                maxSortTomorrow = self.simulationsNoGold(expectedReturns, N+1, currentAlocation, capital, prices)
-                self.maxSortAloTomorrow = maxSortTomorrow[5:8]
-            else:
-                self.maxSortAloTomorrow = maxSortToday[5:8]
+            
+            maxSortTomorrow = self.simulationsNoGold(expectedReturns, N, currentAlocation, capital, prices)
+            self.maxSortAloTomorrow = maxSortTomorrow[5:8]
+            print(self.maxSortTomorrow)
+            
+        else:
+            maxSortToday = self.simulations(returns, N)
+            dailyOptimalRatios.append(maxSortToday[5:8])
+            
+            maxSortTomorrow = self.simulations(expectedReturns, N, currentAlocation, capital, prices)
+            self.maxSortAloTomorrow = maxSortTomorrow[5:8]
+            
 
         #self.maxSortStats = maxSortToday[:5]
         #self.maxSortStatsTomorrow = maxSortTomorrow[:5]
@@ -66,9 +65,6 @@ class Portfolio():
 
         df = pd.DataFrame(returns)
         #df = np.log(df + 1)
-
-
-        print(df)
 
         for i in range(num_runs):
             
@@ -98,8 +94,8 @@ class Portfolio():
             tradingCost = 0
             if currentAlo != [0]:
                 #trading cost
-                x = abs(currentAlo[1] - (weights[1]*capital)) / prices[1]
-                y = abs(currentAlo[2] - (weights[2]*capital)) / prices[2]
+                x = abs(currentAlo[1] - (weights[1] * capital)) / prices[1]
+                y = abs(currentAlo[2] - (weights[2] * capital)) / prices[2]
                 tradingCost = 2*x + y  #maybe 2 times this? have a think!
             
                 
@@ -125,25 +121,26 @@ class Portfolio():
         #M-value (which one to pick?) a function of sortino and adjusted distance
         
         maxIndex = int(result['Sortino'].idxmax())
-        bestRow = result.iloc[maxIndex]
-        if N > 1:
+        bestRow = result.loc[maxIndex].to_list()
+        if currentAlo != [0]:
             max_Sortino = bestRow[4]
             min_Sortino = result['Sortino'].min()
             result['NormedSortino'] = ((result.Sortino - min_Sortino) / (max_Sortino - min_Sortino))
 
             max_distance = result['adjustedDistance'].max()
             min_distance = result['adjustedDistance'].min()
-            result['NormedDistance'] = ((result.adjustedDistance - min_distance) / (max_distance - min_distance))
+            result['NormedDistance'] = ((result['adjustedDistance'] - min_distance) / (max_distance - min_distance))
 
             result['M-Value'] = result['NormedSortino'] + result['NormedDistance']
 
             maxIndex = result['M-Value'].idxmax()
-            bestRow = result.iloc[maxIndex]
+            bestRow = result.loc[maxIndex].to_list()
 
         #get plots we need
-        if N == 3:
+        if N == 10:
             self.plotMinsMaxs(result)
 
+        
         return bestRow
 
     def simulationsNoGold(self, returns, N, currentAlo = [0], capital = 1000, prices = [0]): #n=trading day
@@ -156,9 +153,8 @@ class Portfolio():
         result = np.zeros((num_runs,9))
 
         df = pd.DataFrame(returns)
-        df = np.log(df/df.shift(1))
+        #df = np.log(df/df.shift(1))
 
-        df
 
         for i in range(num_runs):
             
@@ -215,8 +211,8 @@ class Portfolio():
         #our selection optimal alocation ratio is the one associated with highest M
         #M-value (which one to pick?) a function of sortino and adjusted distance
         maxIndex = result['Sortino'].idxmax()
-        bestRow = result.iloc[[maxIndex]]
-        if N > 1:
+        bestRow = result.iloc[[maxIndex]].to_list()
+        if currentAlo != [0]:
             max_Sortino = bestRow[4]
             min_Sortino = result['Sortino'].min()
             result['NormedSortino'] = ((result.Sortino - min_Sortino) / (max_Sortino - min_Sortino))
@@ -228,11 +224,11 @@ class Portfolio():
             result['M-Value'] = result['NormedSortino'] + result['NormedDistance']
 
             maxIndex = result['M-Value'].idxmax()
-            bestRow = result.iloc[[maxIndex]]
+            bestRow = result.iloc[[maxIndex]].to_list()
 
 
         #get plots we need
-        if N == 3:
+        if N == 5:
             self.plotMinsMaxs(result)
 
         return bestRow
@@ -251,6 +247,6 @@ class Portfolio():
         #Plot a red star to highlight position of the portfolio with highest Sortino Ratio
         plt.scatter(Max_Sortino[1],Max_Sortino[0],marker=(5,1,0),color='r',s=600)
 
-        plt.savefig("max_sortino_radio_day_3.csv")
+        plt.savefig("max_sortino_radio_day_3.jpg")
 
         plt.show()
