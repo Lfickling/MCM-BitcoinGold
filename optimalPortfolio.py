@@ -17,7 +17,7 @@ from projReturn import ProjReturn
 
 
 # of simulation runs
-num_runs = 1000
+num_runs = 100
 
 class Portfolio():
 

@@ -125,8 +125,8 @@ def day_main():
     yesterdayMuG = 0
     netReturns = 0
 
-    bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_dfnew.csv')
-    goldDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/gold_dfnew.csv')
+    bitcoinDF = pd.read_csv('/home/brady/repos/MCM-BitcoinGold/data_frames/bitcoin_dfnew.csv')
+    goldDF = pd.read_csv('/home/brady/repos/MCM-BitcoinGold/data_frames/gold_dfnew.csv')
 
     comparedReturns["date"].append(bitcoinDF.iloc[0,2])
     comparedReturns["date"].append(bitcoinDF.iloc[1,2])
