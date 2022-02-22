@@ -266,6 +266,6 @@ class Portfolio():
         #Plot a red star to highlight position of the portfolio with highest Sortino Ratio
         plt.scatter(Max_Sortino[1],Max_Sortino[0],marker=(5,1,0),color='r',s=600)
 
-        plt.savefig("max_sortino_radio_day_3.jpg")
+        plt.savefig("max_sortino_radio_day.jpg")
 
         plt.show()

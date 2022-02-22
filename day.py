@@ -10,7 +10,7 @@ length = 1822
 
 proportionalAlocations = {"date": [], "real_cash": [1, 1, 1, 1], "real_bit": [0, 0, 0, 0], "real_gold": [0, 0, 0, 0]}
 alocations = [[1000, 0, 0], [1000, 0, 0], [1000, 0, 0], [1000, 0, 0]]
-totalCapital = [1000.00, 1000.00, 1000.00, 1000.00]
+totalCapital = [1000.00, 1000.00, 1000.00, 1000.00, 1000.00]
 dailyReturns = {"date":[], "returns": [0, 0, 0, 0]}
 
 dailyOptimalAlo = {"Opt_cash": [1000, 1000, 1000, 1000], "Opt_bit": [0, 0, 0, 0], "Opt_gold": [0, 0, 0, 0]}
@@ -42,17 +42,17 @@ def getProportionalAllocation(allocation, totalCapital):
 def getGoldExpectedVsRealPlot(comparedReturnDF, start, stop):
     #graph optimal returns compared to real returns
     
-    ax = plt.gca() 
+    ax2 = plt.gca() 
     comparedReturnDF[start:stop].plot(kind = 'line',
             x = 'date',
             y = 'realG',
-            color = 'green',ax = ax)
+            color = 'green',ax = ax2)
     comparedReturnDF[start:stop].plot(kind = 'line',x = 'date',
             y = 'projectedG',
-            color = 'blue',ax = ax)
+            color = 'blue',ax = ax2)
       
     # set the title
-    plt.title('GMB Expected Gold Return vs. Real GoldReturn')
+    plt.title('GMB Expected Gold Return vs. Real Gold Return')
     # save the plot
     plt.savefig("GBM_expected_vs_real_gold.jpg")
     #show the plot
@@ -61,14 +61,14 @@ def getGoldExpectedVsRealPlot(comparedReturnDF, start, stop):
 def getBitExpectedVsRealPlot(comparedReturnDF, start, stop):
     #graph optimal returns compared to real returns
     
-    ax = plt.gca() 
+    ax1 = plt.gca() 
     comparedReturnDF[start:stop].plot(kind = 'line',
             x = 'date',
             y = 'realB',
-            color = 'green',ax = ax)
+            color = 'green',ax = ax1)
     comparedReturnDF[start:stop].plot(kind = 'line',x = 'date',
             y = 'projectedB',
-            color = 'blue',ax = ax)
+            color = 'blue',ax = ax1)
       
     # set the title
     plt.title('GMB Expected Bitcoin Return vs. Real Bitcoin Return')
@@ -127,7 +127,6 @@ def getTotalCapitalPlot(comparedReturnDF, start, stop):
     #show the plot
     plt.show()
 
-
 def printStats(sortinosList, netReturns):
     print('the optimal sortino ratios on days 3, 5, 10, 50, 100, 1725 and the last day:')
     print(sortinosList[0], ' ', sortinosList[2], ' ', sortinosList[7], sortinosList[47], sortinosList[97], sortinosList[-100],  sortinosList[length-4])
@@ -141,8 +140,9 @@ def day_main():
     yesterdayMuG = 0
     netReturns = 0
 
-    bitcoinDF = pd.read_csv('/home/brady/repos/MCM-BitcoinGold/data_frames/bitcoin_dfnew.csv')
-    goldDF = pd.read_csv('/home/brady/repos/MCM-BitcoinGold/data_frames/gold_dfnew.csv')
+    bitcoinDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/bitcoin_dfnew.csv')
+    goldDF = pd.read_csv('/home/lfickling/Spring 22/MCM/MCM-BitcoinGold/data_frames/gold_dfnew.csv')
+
 
     comparedReturns["date"].append(bitcoinDF.iloc[0,2])
     comparedReturns["date"].append(bitcoinDF.iloc[1,2])
