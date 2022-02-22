@@ -17,7 +17,7 @@ from projReturn import ProjReturn
 
 
 # of simulation runs
-num_runs = 1000
+num_runs = 250
 
 class Portfolio():
 
@@ -27,10 +27,10 @@ class Portfolio():
     dailyOptimalAlo = []
     sortino = 0
     
-    #initial
+    #initialize and run sims. assign optimal values to variables
     def __init__(self, expectedReturns, returns, currentAlocation, prices, capital, N, noGoldDay = False): #N = trading day
         
-        if  noGoldDay: 
+        if  noGoldDay: #if the gold market is closed
             maxSortToday = self.simulationsNoGold(returns, N, currentAlocation, capital, prices, True)
             self.dailyOptimalAlo = maxSortToday[5:8]
             
@@ -38,7 +38,7 @@ class Portfolio():
             self.maxSortAloTomorrow = maxSortTomorrow[5:8]
             
             
-        else:
+        else: #if gold can be traded today
             maxSortToday = self.simulations(returns, N, currentAlocation, capital, prices, True)
             self.dailyOptimalAlo = maxSortToday[5:8]
             
@@ -47,25 +47,27 @@ class Portfolio():
 
         self.trading_costs = maxSortTomorrow[8] 
         self.sortino = maxSortTomorrow[4]
-        #self.maxSortStats = maxSortToday[:5]
-        #self.maxSortStatsTomorrow = maxSortTomorrow[:5]
 
-
+    #return the optimal alocation (percentage) for tomorrow as determined by the historical + expected prices
     def getOptimalPortfolio(self):
 
         return self.maxSortAloTomorrow
 
+    #return the ideal alocation for today
     def getDailyOptimalAlo(self):
 
         return self.dailyOptimalAlo
 
+    #return the maximum sortino value from tomorrows optimal alo
     def getSortino(self):
 
         return self.sortino
     
+    #return trading costs associated with the optimal alo
     def getTradingCosts(self):
         return self.trading_costs
     
+    #ruuun simulations when gold can be traded. return optimal alo and it's sortino and trading costs in a list
     def simulations(self, returns, N, currentAlo = [0], capital = 0, prices = [0], justSortino = False): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
         
@@ -149,12 +151,13 @@ class Portfolio():
             bestRow = result.loc[maxIndex].to_list()
 
         #get plots we need
-        if N == 15:
+        if N == 50:
             self.plotMinsMaxs(result)
 
         
         return bestRow
 
+    #ruuun simulations when gold cant be traded. return optimal alo and it's sortino and trading costs in a list
     def simulationsNoGold(self, returns, N, currentAlo = [0], capital = 1000, prices = [0], justSortino = False): #n=trading day
         # Creating 10000 random simulations of each portfolio weight configuration
         
@@ -248,6 +251,7 @@ class Portfolio():
 
         return bestRow
     
+    #plot the sortino ratios for all sims for a day. called from the simulations methods once they are finished running. but only on certain days
     def plotMinsMaxs(self, result):
 
         Max_Sortino = result.iloc[result['Sortino'].idxmax()]

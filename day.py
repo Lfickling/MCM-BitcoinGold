@@ -79,8 +79,6 @@ def getBitExpectedVsRealPlot(comparedReturnDF, start, stop):
 
 def getAloPlot(start, stop):
 
-    for key in proportionalAlocations:
-        print(len(proportionalAlocations[key]))
     comparedAlocationsDF = pd.DataFrame(proportionalAlocations)
 
     ax = plt.gca() 
@@ -110,11 +108,29 @@ def getAloPlot(start, stop):
     plt.savefig("comparedAlocations.jpg")
     #show the plot
     plt.show()
-    return
+
+def getTotalCapitalPlot(comparedReturnDF, start, stop):
+     #graph optimal returns compared to real returns
+    comparedReturnDF['Total Wealth'] = totalCapital
+
+    ax = plt.gca() 
+    comparedReturnDF[start:stop].plot(kind = 'line',
+            x = 'date',
+            y = 'Total Wealth',
+            color = 'green',ax = ax)
+    
+      
+    # set the title
+    plt.title('Total Capital over Time')
+    # save the plot
+    plt.savefig("totalCapital.jpg")
+    #show the plot
+    plt.show()
+
 
 def printStats(sortinosList, netReturns):
-    print('the optimal sortino ratios on days 3, 5 10, and the last day:')
-    print(sortinosList[0], ' ', sortinosList[5], ' ', sortinosList[length-4])
+    print('the optimal sortino ratios on days 3, 5, 10, 50, 100, 1725 and the last day:')
+    print(sortinosList[0], ' ', sortinosList[2], ' ', sortinosList[7], sortinosList[47], sortinosList[97], sortinosList[-100],  sortinosList[length-4])
     print('the net returns are: ', netReturns)
 
 def day_main():
@@ -227,11 +243,13 @@ def day_main():
         proportionalAlocations['real_gold'].append(proportialAlo[2])
         alocations.append(realAlo)
 
+        #apend daily optimal alos
         optPort = portfolio.getDailyOptimalAlo()
         dailyOptimalAlo['Opt_cash'].append(optPort[0])
         dailyOptimalAlo['Opt_bit'].append(optPort[1])
         dailyOptimalAlo['Opt_gold'].append(optPort[2])
 
+        #append daily sortinos
         dailySortinos.append(portfolio.getSortino())
 
         #call calctotalcapital and update
@@ -244,13 +262,17 @@ def day_main():
         yesterdayPrices = prices
     
     comparedReturnsDF = pd.DataFrame(comparedReturns)
-    getGoldExpectedVsRealPlot(comparedReturnsDF, 5, 15)
-    getBitExpectedVsRealPlot(comparedReturnsDF, 5, 15)
+    getGoldExpectedVsRealPlot(comparedReturnsDF, 0, length)
+    getBitExpectedVsRealPlot(comparedReturnsDF, 0, length)
 
     proportionalAlocations.update(dailyOptimalAlo)
-    getAloPlot(5, 15)
+    getAloPlot(0, length)
+
+    getTotalCapitalPlot(comparedReturnsDF, 0, length)
 
     printStats(dailySortinos, netReturns)
+
+    getTotalCapitalPlot(comparedReturnsDF, 0, length)
 
 
 if __name__ == '__main__':
