@@ -6,11 +6,11 @@ from optimalPortfolio import Portfolio
 from projReturn import ProjReturn
 
 #how many does should it run for: should be no more than # of rows - 3
-length = 1822
+length = 1000
 
 proportionalAlocations = {"date": [], "real_cash": [1, 1, 1, 1], "real_bit": [0, 0, 0, 0], "real_gold": [0, 0, 0, 0]}
 alocations = [[1000, 0, 0], [1000, 0, 0], [1000, 0, 0], [1000, 0, 0]]
-totalCapital = [1000.00, 1000.00, 1000.00, 1000.00, 1000.00]
+totalCapital = [1000.00, 1000.00, 1000.00]
 dailyReturns = {"date":[], "returns": [0, 0, 0, 0]}
 
 dailyOptimalAlo = {"Opt_cash": [1000, 1000, 1000, 1000], "Opt_bit": [0, 0, 0, 0], "Opt_gold": [0, 0, 0, 0]}
